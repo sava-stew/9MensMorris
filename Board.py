@@ -18,7 +18,7 @@ class Board(tk.Tk):
         self.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
     def createBoard(self):
-        canvas = tk.Canvas(board, width=500, height=500, bg='#987554')
+        canvas = tk.Canvas(self, width=500, height=500, bg='#987554')
         canvas.pack(anchor=tk.CENTER, expand=True)
 
         g1 = tk.Button(canvas, text='O', command=None)
