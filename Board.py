@@ -2,6 +2,50 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.ttk import Label
 
+#for index 0
+#open
+#white
+#black
+
+#for index 1
+#noMill
+#newMill
+#oldMill
+
+#when the button is pressed
+#need to get the variable name of button
+#variable name of the button will be the dictionary key
+#need to get player color
+#call function with player color and button name
+#function should access the key (button name) and change index[0] of list to player
+
+placements = {
+    'g1': ['open', 'noMill'],
+    'g4': ['open', 'noMill'],
+    'g7': ['open', 'noMill'],
+    'f2': ['open', 'noMill'],
+    'f4': ['open', 'noMill'],
+    'f6': ['open', 'noMill'],
+    'e3': ['open', 'noMill'],
+    'e4': ['open', 'noMill'],
+    'e5': ['open', 'noMill'],
+    'd1': ['open', 'noMill'],
+    'd2': ['open', 'noMill'],
+    'd3': ['open', 'noMill'],
+    'd5': ['open', 'noMill'],
+    'd6': ['open', 'noMill'],
+    'd7': ['open', 'noMill'],
+    'c3': ['open', 'noMill'],
+    'c4': ['open', 'noMill'],
+    'c5': ['open', 'noMill'],
+    'b2': ['open', 'noMill'],
+    'b4': ['open', 'noMill'],
+    'b6': ['open', 'noMill'],
+    'a1': ['open', 'noMill'],
+    'a4': ['open', 'noMill'],
+    'a7': ['open', 'noMill'],
+}
+
 class Board(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -18,7 +62,7 @@ class Board(tk.Tk):
         self.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
     def createBoard(self):
-        canvas = tk.Canvas(board, width=500, height=500, bg='#987554')
+        canvas = tk.Canvas(self, width=500, height=500, bg='#987554')
         canvas.pack(anchor=tk.CENTER, expand=True)
 
         g1 = tk.Button(canvas, text='O', command=None)
