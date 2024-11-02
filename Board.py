@@ -2,8 +2,9 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import *
 from tkinter.ttk import Label
-from PIL import Image, ImageTk
+#from PIL import Image, ImageTk
 from Turn import Turn
+from Player import Player
 
 #for index 0
 #open
@@ -48,6 +49,9 @@ placements = {
     'a4': ['open', 'noMill', 245, 480],
     'a7': ['open', 'noMill', 480, 480],
 }
+
+black = Player()
+white = Player()
 
 class Board(tk.Tk):
     def __init__(self):
@@ -102,23 +106,23 @@ class Board(tk.Tk):
         turn = Turn()
 
         #draw lines
-        canvas.create_line((20, 20), (480, 20), fill='black')
-        canvas.create_line((105, 90), (385, 90), fill='black')
-        canvas.create_line((175, 160), (315, 160), fill='black')
-        canvas.create_line((20, 245), (175, 245), fill='black')
-        canvas.create_line((315, 245), (480, 245), fill='black')
-        canvas.create_line((175, 340), (315, 340), fill='black')
-        canvas.create_line((105, 410), (385, 410), fill='black')
-        canvas.create_line((20, 480), (480, 480), fill='black')
+        board.create_line((20, 20), (480, 20), fill='black')
+        board.create_line((105, 90), (385, 90), fill='black')
+        board.create_line((175, 160), (315, 160), fill='black')
+        board.create_line((20, 245), (175, 245), fill='black')
+        board.create_line((315, 245), (480, 245), fill='black')
+        board.create_line((175, 340), (315, 340), fill='black')
+        board.create_line((105, 410), (385, 410), fill='black')
+        board.create_line((20, 480), (480, 480), fill='black')
 
-        canvas.create_line((20, 20), (20, 480), fill='black')
-        canvas.create_line((245, 20), (245, 160), fill='black')
-        canvas.create_line((480, 20), (480, 480), fill='black')
-        canvas.create_line((105, 90), (105, 410), fill='black')
-        canvas.create_line((385, 90), (385, 410), fill='black')
-        canvas.create_line((175, 160), (175, 340), fill='black')
-        canvas.create_line((315, 160), (315, 340), fill='black')
-        canvas.create_line((245, 340), (245, 480), fill='black')
+        board.create_line((20, 20), (20, 480), fill='black')
+        board.create_line((245, 20), (245, 160), fill='black')
+        board.create_line((480, 20), (480, 480), fill='black')
+        board.create_line((105, 90), (105, 410), fill='black')
+        board.create_line((385, 90), (385, 410), fill='black')
+        board.create_line((175, 160), (175, 340), fill='black')
+        board.create_line((315, 160), (315, 340), fill='black')
+        board.create_line((245, 340), (245, 480), fill='black')
 
         #draw board
         #'O' button for open,
@@ -128,9 +132,9 @@ class Board(tk.Tk):
         #add Buttons to dict
         for value in placements.values():
             print(type(value))
-            value.append(tk.Button(canvas, text='O'))
+            value.append(tk.Button(board, text='O'))
 
-        self.drawButtons(canvas, turn)
+        self.drawButtons(board, turn)
 
     def drawButtons(self, canvas, turn):
         for placement in placements.values():
@@ -152,13 +156,15 @@ class Board(tk.Tk):
         self.replayOptions()
 
     def onButtonPress(self, button, canvas, turn):
-        print(button)
-        if button[0] == "open" and turn.getTurn() == 'black':
+        #print(button)
+        if button[0] == "open" and turn.getTurn() == 'black' and black.getBankPieces() != 0:
             #button.config(text="",height=3,width=5,bg="black")
+            black.bankUpdate()
             button[0] = "black"
             turn.changeTurn()
-        elif button[0] == "open" and turn.getTurn() == 'white':
+        elif button[0] == "open" and turn.getTurn() == 'white' and white.getBankPieces() != 0:
             #button.config(text="",height=3,width=5,bg="white")
+            white.bankUpdate()
             button[0] = "white"
             turn.changeTurn()
         self.checkMills()
@@ -193,3 +199,4 @@ class Board(tk.Tk):
                 placements[mill[2]][1] = "blackMill"
 
         return
+
