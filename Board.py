@@ -23,7 +23,7 @@ from Turn import Turn
 #function should access the key (button name) and change index[0] of list to player
 
 placements = {
-    'g1': ['open', 'noMill', 20, 20],
+    'g1': ['open', 'noMill', 20, 20], #g1 g4 and g7 are all the same color, you should change noMill to Mill for g1 g4 and g7
     'g4': ['open', 'noMill', 245, 20],
     'g7': ['open', 'noMill', 480, 20],
     'f2': ['open', 'noMill', 105, 90],
@@ -70,116 +70,21 @@ class Board(tk.Tk):
 
         turn = Turn()
 
-        print(type(placements["g1"]))
-        for value in placements.values():
-            print(type(value))
-            value.append(tk.Button(canvas, text='O'))
-
-        #for placement in placements.values():
-        #    print(type(placement[4]))
-        #    placement[4].config(command=lambda : Board.onButtonPress(placement[4],turn))
-        #    canvas.create_window(placement[2],placement[3],placement[4])
-
-        g1 = tk.Button(canvas, text='O')
-        g1.config(command=lambda : Board.onButtonPress(g1,turn))
-        canvas.create_window(20, 20, window=g1)
-        g4 = tk.Button(canvas, text='O')
-        g4.config(command=lambda: Board.onButtonPress(g4,turn))
-        canvas.create_window(245, 20, window=g4)
-        g7 = tk.Button(canvas, text='O')
-        g7.config(command=lambda: Board.onButtonPress(g7,turn))
-        canvas.create_window(480, 20, window=g7)
-
+        #draw lines
         canvas.create_line((20, 20), (245, 20), fill='black')
         canvas.create_line((245, 20), (480, 20), fill='black')
-
-        f2 = tk.Button(canvas, text='O')
-        f2.config(command=lambda: Board.onButtonPress(f2,turn))
-        canvas.create_window(105, 90, window=f2)
-        f4 = tk.Button(canvas, text='O')
-        f4.config(command=lambda: Board.onButtonPress(f4,turn))
-        canvas.create_window(245, 90, window=f4)
-        f6 = tk.Button(canvas, text='O')
-        f6.config(command=lambda: Board.onButtonPress(f6,turn))
-        canvas.create_window(385, 90, window=f6)
-
         canvas.create_line((105, 90), (245, 90), fill='black')
         canvas.create_line((245, 90), (385, 90), fill='black')
-
-
-        e3 = tk.Button(canvas, text='O')
-        e3.config(command=lambda: Board.onButtonPress(e3,turn))
-        canvas.create_window(175, 160, window=e3)
-        e4 = tk.Button(canvas, text='O')
-        e4.config(command=lambda: Board.onButtonPress(e4,turn))
-        canvas.create_window(245, 160, window=e4)
-        e5 = tk.Button(canvas, text='O')
-        e5.config(command=lambda: Board.onButtonPress(e5,turn))
-        canvas.create_window(315, 160, window=e5)
-
         canvas.create_line((175, 160), (245, 160), fill='black')
         canvas.create_line((245, 160), (315, 160), fill='black')
-
-        d1 = tk.Button(canvas, text='O')
-        d1.config(command=lambda: Board.onButtonPress(d1,turn))
-        canvas.create_window(20, 245, window=d1)
-        d2 = tk.Button(canvas, text='O')
-        d2.config(command=lambda: Board.onButtonPress(d2,turn))
-        canvas.create_window(105, 245, window=d2)
-        d3 = tk.Button(canvas, text='O')
-        d3.config(command=lambda: Board.onButtonPress(d3,turn))
-        canvas.create_window(175, 245, window=d3)
-        d5  = tk.Button(canvas, text='O')
-        d5.config(command=lambda: Board.onButtonPress(d5,turn))
-        canvas.create_window(315, 245, window=d5)
-        d6 = tk.Button(canvas, text='O')
-        d6.config(command=lambda: Board.onButtonPress(d6,turn))
-        canvas.create_window(385, 245, window=d6)
-        d7 = tk.Button(canvas, text='O')
-        d7.config(command=lambda: Board.onButtonPress(d7,turn))
-        canvas.create_window(480, 245, window=d7)
-
         canvas.create_line((20, 245), (105, 245), fill='black')
         canvas.create_line((105, 245), (175, 245), fill='black')
         canvas.create_line((315, 245), (385, 245), fill='black')
         canvas.create_line((385, 245), (480, 245), fill='black')
-
-        c3 = tk.Button(canvas, text='O')
-        c3.config(command=lambda: Board.onButtonPress(c3,turn))
-        canvas.create_window(175, 340, window=c3)
-        c4 = tk.Button(canvas, text='O')
-        c4.config(command=lambda: Board.onButtonPress(c4,turn))
-        canvas.create_window(245, 340, window=c4)
-        c5 = tk.Button(canvas, text='O')
-        c5.config(command=lambda: Board.onButtonPress(c5,turn))
-        canvas.create_window(315, 340, window=c5)
-
         canvas.create_line((175, 340), (245, 340), fill='black')
         canvas.create_line((245, 340), (315, 340), fill='black')
-
-        b2 = tk.Button(canvas, text='O')
-        b2.config(command=lambda: Board.onButtonPress(b2,turn))
-        canvas.create_window(105, 410, window=b2)
-        b4 = tk.Button(canvas, text='O')
-        b4.config(command=lambda: Board.onButtonPress(b4,turn))
-        canvas.create_window(245, 410, window=b4)
-        b6 = tk.Button(canvas, text='O')
-        b6.config(command=lambda: Board.onButtonPress(b6,turn))
-        canvas.create_window(385, 410, window=b6)
-
         canvas.create_line((105, 410), (245, 410), fill='black')
         canvas.create_line((245, 410), (385, 410), fill='black')
-
-        a1 = tk.Button(canvas, text='O')
-        a1.config(command=lambda: Board.onButtonPress(a1,turn))
-        canvas.create_window(20, 480, window=a1)
-        a4 = tk.Button(canvas, text='O')
-        a4.config(command=lambda: Board.onButtonPress(a4,turn))
-        canvas.create_window(245, 480, window=a4)
-        a7 = tk.Button(canvas, text='O')
-        a7.config(command=lambda: Board.onButtonPress(a7,turn))
-        canvas.create_window(480, 480, window=a7)
-
         canvas.create_line((20, 480), (245, 480), fill='black')
         canvas.create_line((245, 480), (480, 480), fill='black')
 
@@ -200,14 +105,74 @@ class Board(tk.Tk):
         canvas.create_line((245, 410), (245, 480), fill='black')
         canvas.create_line((480, 245), (480, 480), fill='black')
 
+        #draw board
+        #'O' button for open,
+        #black button for black
+        #white button for white
+        print(type(placements["g1"]))
+        #add Buttons to dict
+        for value in placements.values():
+            print(type(value))
+            value.append(tk.Button(canvas, text='O'))
+
+        self.drawButtons(canvas, turn)
+
+    def drawButtons(self, canvas, turn):
+        for placement in placements.values():
+            #print(type(placement[4]))
+            placement[4].config(command=lambda i=placement: Board.onButtonPress(self, i, canvas, turn))
+            if placement[0] == "open":
+                canvas.create_window(placement[2], placement[3], window=placement[4])
+            elif placement[0] == "white":
+                placement[4].config(text="", height=3, width=5, bg="white")
+                canvas.create_window(placement[2], placement[3], window=placement[4])
+            elif placement[0] == "black":
+                placement[4].config(text="", height=3, width=5, bg="black")
+                canvas.create_window(placement[2], placement[3], window=placement[4])
+        return
+
     def setUp(self):
         self.createBoard()
 
-    def onButtonPress(button, turn):
-        if button['text'] == "O" and turn.getTurn() == 'black':
-            button.config(text="",height=3,width=5,bg="black")
+    def onButtonPress(self, button, canvas, turn):
+        print(button)
+        if button[0] == "open" and turn.getTurn() == 'black':
+            #button.config(text="",height=3,width=5,bg="black")
+            button[0] = "black"
             turn.changeTurn()
-        elif button['text'] == "O" and turn.getTurn() == 'white':
-            button.config(text="",height=3,width=5,bg="white")
+        elif button[0] == "open" and turn.getTurn() == 'white':
+            #button.config(text="",height=3,width=5,bg="white")
+            button[0] = "white"
             turn.changeTurn()
+        self.checkMills()
+        self.drawButtons(canvas, turn)
 
+    def checkMills(self):
+        mills = [('g1','g4','g7'),
+                 ('f2','f4','f6'),
+                 ('e3','e4','e5'),
+                 ('d1','d2','d3'),
+                 ('d5','d6','d7'),
+                 ('c3','c4','c5'),
+                 ('b2','b4','b6'),
+                 ('a1','a4','a7'),
+                 ('g1','d1','a1'),
+                 ('f2','d2','b2'),
+                 ('e3','d3','c3'),
+                 ('g4','f4','e4'),
+                 ('c4','b4','a4'),
+                 ('e5','d5','c5'),
+                 ('f6','d6','b6'),
+                 ('g7','d7','a7')]
+
+        for mill in mills:
+            if placements[mill[0]][0] == "white" and placements[mill[1]][0] == "white" and placements[mill[2]][0] == "white":
+                placements[mill[0]][1] = "whiteMill"
+                placements[mill[1]][1] = "whiteMill"
+                placements[mill[2]][1] = "whiteMill"
+            elif placements[mill[0]][0] == "black" and placements[mill[1]][0] == "black" and placements[mill[2]][0] == "black":
+                placements[mill[0]][1] = "blackMill"
+                placements[mill[1]][1] = "blackMill"
+                placements[mill[2]][1] = "blackMill"
+
+        return
