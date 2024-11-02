@@ -62,11 +62,42 @@ class Board(tk.Tk):
         center_x = int(screen_width/2 - window_width/2)
         center_y = int(screen_height/2 - window_height/2)
 
+        self.columnconfigure(0, weight=2)
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(2, weight=2)
+        self.rowconfigure(0, weight=2)
+        self.rowconfigure(1, weight=1)
+        self.rowconfigure(2, weight=2)
+
         self.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
+    def createPieces(self):
+        left = tk.Canvas(self, width=100, height=300, bg='#987554')
+        left.grid(column=0, row=1)
+        right = tk.Canvas(self, width=100, height=300, bg='#987554')
+        right.grid(column=2, row=1)
+
+    def replayOptions(self):
+        replayOptions = tk.Canvas(self, width=400, height=80, bg='grey')
+        replayOptions.grid(column=1, row=2)
+
+        label = tk.Label(replayOptions, text='Game Replay')
+        replayOptions.create_window(200, 20,window=label)
+
+        manReplay = tk.Button(replayOptions, text='Manual Replay')
+        replayOptions.create_window(100, 50, window=manReplay)
+
+        autoReplay = tk.Button(replayOptions, text='Auto Replay')
+        replayOptions.create_window(290, 50, window=autoReplay)
+
+        delay = 2
+        timeDelay = tk.Entry(replayOptions, textvariable=delay, width=3)
+        replayOptions.create_window(340, 50, window=timeDelay)
+
+
     def createBoard(self):
-        canvas = tk.Canvas(self, width=500, height=500, bg='#987554')
-        canvas.pack(anchor=tk.CENTER, expand=True)
+        board = tk.Canvas(self, width=500, height=500, bg='#987554')
+        board.grid(column=1, row=1)
 
         turn = Turn()
 
@@ -117,6 +148,8 @@ class Board(tk.Tk):
 
     def setUp(self):
         self.createBoard()
+        self.createPieces()
+        self.replayOptions()
 
     def onButtonPress(self, button, canvas, turn):
         print(button)
