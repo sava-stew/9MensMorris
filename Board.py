@@ -94,7 +94,6 @@ class Board(tk.Tk):
         timeDelay = tk.Entry(replayOptions, textvariable=delay, width=3)
         replayOptions.create_window(340, 50, window=timeDelay)
 
-
     def createBoard(self):
         board = tk.Canvas(self, width=500, height=500, bg='#987554')
         board.grid(column=1, row=1)
@@ -102,23 +101,23 @@ class Board(tk.Tk):
         turn = Turn()
 
         #draw lines
-        canvas.create_line((20, 20), (480, 20), fill='black')
-        canvas.create_line((105, 90), (385, 90), fill='black')
-        canvas.create_line((175, 160), (315, 160), fill='black')
-        canvas.create_line((20, 245), (175, 245), fill='black')
-        canvas.create_line((315, 245), (480, 245), fill='black')
-        canvas.create_line((175, 340), (315, 340), fill='black')
-        canvas.create_line((105, 410), (385, 410), fill='black')
-        canvas.create_line((20, 480), (480, 480), fill='black')
+        board.create_line((20, 20), (480, 20), fill='black')
+        board.create_line((105, 90), (385, 90), fill='black')
+        board.create_line((175, 160), (315, 160), fill='black')
+        board.create_line((20, 245), (175, 245), fill='black')
+        board.create_line((315, 245), (480, 245), fill='black')
+        board.create_line((175, 340), (315, 340), fill='black')
+        board.create_line((105, 410), (385, 410), fill='black')
+        board.create_line((20, 480), (480, 480), fill='black')
 
-        canvas.create_line((20, 20), (20, 480), fill='black')
-        canvas.create_line((245, 20), (245, 160), fill='black')
-        canvas.create_line((480, 20), (480, 480), fill='black')
-        canvas.create_line((105, 90), (105, 410), fill='black')
-        canvas.create_line((385, 90), (385, 410), fill='black')
-        canvas.create_line((175, 160), (175, 340), fill='black')
-        canvas.create_line((315, 160), (315, 340), fill='black')
-        canvas.create_line((245, 340), (245, 480), fill='black')
+        board.create_line((20, 20), (20, 480), fill='black')
+        board.create_line((245, 20), (245, 160), fill='black')
+        board.create_line((480, 20), (480, 480), fill='black')
+        board.create_line((105, 90), (105, 410), fill='black')
+        board.create_line((385, 90), (385, 410), fill='black')
+        board.create_line((175, 160), (175, 340), fill='black')
+        board.create_line((315, 160), (315, 340), fill='black')
+        board.create_line((245, 340), (245, 480), fill='black')
 
         #draw board
         #'O' button for open,
@@ -128,9 +127,9 @@ class Board(tk.Tk):
         #add Buttons to dict
         for value in placements.values():
             print(type(value))
-            value.append(tk.Button(canvas, text='O'))
+            value.append(tk.Button(board, text='O'))
 
-        self.drawButtons(canvas, turn)
+        self.drawButtons(board, turn)
 
     def drawButtons(self, canvas, turn):
         for placement in placements.values():
