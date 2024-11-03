@@ -180,6 +180,7 @@ class Board(tk.Tk):
             button[0] = "white"
             turn.changeTurn()
         self.banks()
+        self.checkMills()
         self.drawButtons(canvas, turn)
 
     def checkMills(self):
