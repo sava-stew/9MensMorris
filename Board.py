@@ -75,11 +75,23 @@ class Board(tk.Tk):
 
         self.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
-    def createPieces(self):
-        left = tk.Canvas(self, width=100, height=300, bg='#987554')
-        left.grid(column=0, row=1)
-        right = tk.Canvas(self, width=100, height=300, bg='#987554')
-        right.grid(column=2, row=1)
+    def createPieces(self, bank, num, y0, y1, color):
+        bank.delete('all')
+        for i in range(0, num, 1):
+            piece = bank.create_rectangle((3, y0), (20, y1), fill=color)
+            y0 += 25
+            y1 += 25
+
+    def banks(self):
+
+        whiteBank = tk.Canvas(self, width=20)
+        whiteBank.grid(column=0, row=1)
+        self.createPieces(whiteBank, white.getBankPieces(), 20, 40, 'white')
+
+        blackBank = tk.Canvas(self, width=20)
+        blackBank.grid(column=2, row=1)
+        self.createPieces(blackBank, black.getBankPieces(), 20, 40, 'black')
+
 
     def replayOptions(self):
         replayOptions = tk.Canvas(self, width=400, height=80, bg='grey')
@@ -152,7 +164,7 @@ class Board(tk.Tk):
 
     def setUp(self):
         self.createBoard()
-        self.createPieces()
+        self.banks()
         self.replayOptions()
 
     def onButtonPress(self, button, canvas, turn):
@@ -167,6 +179,7 @@ class Board(tk.Tk):
             white.bankUpdate()
             button[0] = "white"
             turn.changeTurn()
+        self.banks()
         self.checkMills()
         self.drawButtons(canvas, turn)
 
