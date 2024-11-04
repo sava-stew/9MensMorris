@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, simpledialog
 from tkinter import *
 from tkinter.ttk import Label
 #from PIL import Image, ImageTk
@@ -140,10 +140,10 @@ class Board(tk.Tk):
         #'O' button for open,
         #black button for black
         #white button for white
-        print(type(placements["g1"]))
+        #print(type(placements["g1"]))
         #add Buttons to dict
         for value in placements.values():
-            print(type(value))
+            #print(type(value))
             value.append(tk.Button(board, text='O'))
 
         self.drawButtons(board, turn)
@@ -168,7 +168,7 @@ class Board(tk.Tk):
         self.replayOptions()
 
     def onButtonPress(self, button, canvas, turn):
-        #print(button)
+        print(button)
         if button[0] == "open" and turn.getTurn() == 'black' and black.getBankPieces() != 0:
             #button.config(text="",height=3,width=5,bg="black")
             black.bankUpdate()
@@ -203,13 +203,55 @@ class Board(tk.Tk):
 
         for mill in mills:
             if placements[mill[0]][0] == "white" and placements[mill[1]][0] == "white" and placements[mill[2]][0] == "white":
+                #if there is a mill, but it's not listed in the dictionary, it must have just been made.
+                #therefore, you get to remove a piece
+                if placements[mill[0]][1] != "whiteMill" or placements[mill[1]][1] != "whiteMill" or placements[mill[2]][1] != "whiteMill":
+                    self.removeOpponentPiece("black")
                 placements[mill[0]][1] = "whiteMill"
                 placements[mill[1]][1] = "whiteMill"
                 placements[mill[2]][1] = "whiteMill"
             elif placements[mill[0]][0] == "black" and placements[mill[1]][0] == "black" and placements[mill[2]][0] == "black":
+                if placements[mill[0]][1] != "blackMill" or placements[mill[1]][1] != "blackMill" or placements[mill[2]][1] != "blackMill":
+                    self.removeOpponentPiece("white")
                 placements[mill[0]][1] = "blackMill"
                 placements[mill[1]][1] = "blackMill"
                 placements[mill[2]][1] = "blackMill"
 
         return
 
+    def move_piece(self, from_pos, to_pos):
+
+        if from_pos not in placements or to_pos not in placements:
+            print(f"Position {from_pos} or {to_pos} does not exist.")
+            return False
+
+        if placements[from_pos][0] != 'open' and placements[to_pos][0] == 'open':
+
+            placements[to_pos][0] = placements[from_pos][0]
+            placements[to_pos][4].config(text="", height=3, width=5, bg=placements[to_pos][0])
+
+            placements[from_pos][0] = 'open'
+            placements[from_pos][4].config(text="O", height=1, width=3, bg="SystemButtonFace")
+
+            return True
+        else:
+            print("Invalid move: the target position is not open or the source position does not have a piece.")
+            return False
+
+    def removeOpponentPiece(self, opponent_color):
+        opponent_pieces = [key for key, value in placements.items() if value[0] == opponent_color]
+
+        if not opponent_pieces:
+            print(f"No pieces to remove for {opponent_color}.")
+            return
+
+        piece_to_remove = simpledialog.askstring("Remove Piece",
+                                                 f"Select a piece to remove from {opponent_color}:\n" + "\n".join(
+                                                     opponent_pieces))
+
+        if piece_to_remove in opponent_pieces:
+            placements[piece_to_remove][0] = 'open'
+            placements[piece_to_remove][4].config(text="O", height=1, width=3, bg="SystemButtonFace")
+            print(f"Removed {opponent_color} piece at {piece_to_remove}.")
+        else:
+            print("Invalid piece selected.")
