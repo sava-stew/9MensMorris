@@ -297,6 +297,10 @@ class Board(tk.Tk):
         if piece_to_remove in opponent_pieces:
             placements[piece_to_remove][0] = 'open'
             placements[piece_to_remove][6].config(text="O", height=1, width=3, bg="SystemButtonFace")
+            if opponent_color == "white":
+                white.pieceUpdate()
+            elif opponent_color == "black":
+                black.pieceUpdate()
             print(f"Removed {opponent_color} piece at {piece_to_remove}.")
         else:
             print("Invalid piece selected.")
