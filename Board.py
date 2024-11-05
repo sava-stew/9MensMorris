@@ -148,10 +148,10 @@ class Board(tk.Tk):
 
         self.drawButtons(board, turn)
 
-    def drawButtons(self, canvas, turn):
+    def drawButtons(self, canvas, turn, origin=""):
         for placement in placements.values():
             #print(type(placement[4]))
-            placement[6].config(command=lambda i=placement: Board.onButtonPress(self, i, canvas, turn))
+            placement[6].config(command=lambda i=placement: Board.onButtonPress(self, i, canvas, turn, origin))
             if placement[0] == "open":
                 canvas.create_window(placement[2], placement[3], window=placement[6])
             elif placement[0] == "white":
@@ -167,8 +167,9 @@ class Board(tk.Tk):
         self.banks()
         self.replayOptions()
 
-    def onButtonPress(self, button, canvas, turn):
+    def onButtonPress(self, button, canvas, turn, origin):
         print(button)
+
         whoseTurn = turn.getTurn()
         if whoseTurn == "white":
             bankPieces = white.getBankPieces()
@@ -177,39 +178,55 @@ class Board(tk.Tk):
             bankPieces = black.getBankPieces()
             boardPieces = black.getPlayerPieces()
 
-        #if the player still has pieces left in the bank, go in "place mode"
-        if bankPieces != 0:
-            if button[0] == "open" and whoseTurn == 'black' and black.getBankPieces() != 0:
-                #button.config(text="",height=3,width=5,bg="black")
-                black.bankUpdate()
-                button[0] = "black"
-                turn.changeTurn()
-            elif button[0] == "open" and whoseTurn == 'white' and white.getBankPieces() != 0:
-                #button.config(text="",height=3,width=5,bg="white")
-                white.bankUpdate()
-                button[0] = "white"
-                turn.changeTurn()
+        if origin == "":
 
-        #if the player has more than 3 pieces left on the board, go in "move mode"
+            #if the player still has pieces left in the bank, go in "place mode"
+            if bankPieces != 0:
+                if button[0] == "open" and whoseTurn == 'black' and black.getBankPieces() != 0:
+                    #button.config(text="",height=3,width=5,bg="black")
+                    black.bankUpdate()
+                    button[0] = "black"
+                    turn.changeTurn()
+                elif button[0] == "open" and whoseTurn == 'white' and white.getBankPieces() != 0:
+                    #button.config(text="",height=3,width=5,bg="white")
+                    white.bankUpdate()
+                    button[0] = "white"
+                    turn.changeTurn()
+
+            #if the player has more than 3 pieces left on the board, go in "move mode"
+            else:
+                #check turn
+                #if color matches turn, reconfigure adjacent buttons into target mode
+                if button[0] == whoseTurn:
+                    origin = button[4]
+                #if pressed button = valid move, move piece
+                #elif button
+                #to_pos = simpledialog.askstring("Move a Piece",
+                #                                         f"Select a space to move to:\n" + "\n".join(
+                #                                             button[5]))
+                #self.move_piece(button[4],to_pos)
+
+                #if the player has only 3 pieces left, go in "fly mode"
+                #elif boardPieces <= 3:
+                #to_pos = simpledialog.askstring("Move a Piece",
+                #                                f"Select a space to move to:\n" + "\n".join(
+                #                                    placements))
+                #self.move_piece(button[4], to_pos)
         elif boardPieces > 3:
-            #check turn
-            #if color matches turn, go into "wait for another button press mode"
-            #if pressed button = valid move, move piece
-            to_pos = simpledialog.askstring("Move a Piece",
-                                                     f"Select a space to move to:\n" + "\n".join(
-                                                         button[5]))
-            self.move_piece(button[4],to_pos)
+            if button[4] in placements[origin][5]:
+                if self.move_piece(origin, button[4]):
+                    origin = ""
+                    turn.changeTurn()
 
-        #if the player has only 3 pieces left, go in "fly mode"
-        elif boardPieces <= 3:
-            to_pos = simpledialog.askstring("Move a Piece",
-                                            f"Select a space to move to:\n" + "\n".join(
-                                                placements))
-            self.move_piece(button[4], to_pos)
+        else:
+            print("fly mode activated")
+            if self.move_piece(origin, button[4]):
+                origin = ""
+                turn.changeTurn()
 
         self.banks()
         self.checkMills()
-        self.drawButtons(canvas, turn)
+        self.drawButtons(canvas, turn, origin)
 
     def checkMills(self):
         mills = [('g1','g4','g7'),
