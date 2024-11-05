@@ -75,6 +75,12 @@ class Board(tk.Tk):
 
         self.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
+    def currentTurn(self, turn):
+        currentTurn = tk.Label(self, text='Current turn: ' + turn)
+        text_var = tk.StringVar()
+        text_var.set('Current turn: ' + turn)
+        currentTurn.grid(column=1, row=0)
+
     def createPieces(self, bank, num, y0, y1, color):
         bank.delete('all')
         for i in range(0, num, 1):
@@ -164,6 +170,7 @@ class Board(tk.Tk):
 
     def setUp(self):
         self.createBoard()
+        self.currentTurn('white')
         self.banks()
         self.replayOptions()
 
@@ -223,7 +230,7 @@ class Board(tk.Tk):
             if self.move_piece(origin, button[4]):
                 origin = ""
                 turn.changeTurn()
-
+        self.currentTurn(turn.getTurn())
         self.banks()
         self.checkMills()
         self.drawButtons(canvas, turn, origin)
