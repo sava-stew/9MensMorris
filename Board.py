@@ -24,36 +24,37 @@ from Player import Player
 #function should access the key (button name) and change index[0] of list to player
 
 placements = {
-    'g1': ['open', 'noMill', 20, 20, "g1", ["g4","d1"]], #g1 g4 and g7 are all the same color, you should change noMill to Mill for g1 g4 and g7
-    'g4': ['open', 'noMill', 245, 20, "g4", ["g1","g7","f4"]],
-    'g7': ['open', 'noMill', 480, 20, "g7", ["g4","d4"]],
-    'f2': ['open', 'noMill', 105, 90, "f2", ["f4","d2"]],
-    'f4': ['open', 'noMill', 245, 90, "f4", ["f2","g4","f6","e4"]],
-    'f6': ['open', 'noMill', 385, 90, "f6", ["f4","d6"]],
-    'e3': ['open', 'noMill', 175, 160, "e3", ["e4","d3"]],
-    'e4': ['open', 'noMill', 245, 160, "e4", ["e3","f4","e5"]],
-    'e5': ['open', 'noMill', 315, 160, "e5", ["e4","d5"]],
-    'd1': ['open', 'noMill', 20, 245, "d1", ["g1","d2","a1"]],
-    'd2': ['open', 'noMill', 105, 245, "d2", ["d1","f2","d3","b2"]],
-    'd3': ['open', 'noMill', 175, 245, "d3", ["d2","e3","c3"]],
-    'd5': ['open', 'noMill', 315, 245, "d5", ["e5","d6","c5"]],
-    'd6': ['open', 'noMill', 385, 245, "d6", ["d5","f6","d7","b6"]],
-    'd7': ['open', 'noMill', 480, 245, "d7", ["d6","g7","a7"]],
-    'c3': ['open', 'noMill', 175, 340, "c3", ["d3","c4"]],
-    'c4': ['open', 'noMill', 245, 340, "c4", ["c3","c5","b4"]],
-    'c5': ['open', 'noMill', 315, 340, "c5", ["c4","d5"]],
-    'b2': ['open', 'noMill', 105, 410, "b2", ["d2","b4"]],
-    'b4': ['open', 'noMill', 245, 410, "b4", ["b2","c4","a4","b6"]],
-    'b6': ['open', 'noMill', 385, 410, "b6", ["b4","d6"]],
-    'a1': ['open', 'noMill', 20, 480, "a1", ["a4","d1"]],
-    'a4': ['open', 'noMill', 245, 480, "a4", ["a1","b4","a7"]],
-    'a7': ['open', 'noMill', 480, 480, "a7", ["a4","d7"]]
+    'g1': ['open', 'noMill', 20, 20, "g1", ["g4","d1"], None], #g1 g4 and g7 are all the same color, you should change noMill to Mill for g1 g4 and g7
+    'g4': ['open', 'noMill', 245, 20, "g4", ["g1","g7","f4"], None],
+    'g7': ['open', 'noMill', 480, 20, "g7", ["g4","d4"], None],
+    'f2': ['open', 'noMill', 105, 90, "f2", ["f4","d2"], None],
+    'f4': ['open', 'noMill', 245, 90, "f4", ["f2","g4","f6","e4"], None],
+    'f6': ['open', 'noMill', 385, 90, "f6", ["f4","d6"], None],
+    'e3': ['open', 'noMill', 175, 160, "e3", ["e4","d3"], None],
+    'e4': ['open', 'noMill', 245, 160, "e4", ["e3","f4","e5"], None],
+    'e5': ['open', 'noMill', 315, 160, "e5", ["e4","d5"], None],
+    'd1': ['open', 'noMill', 20, 245, "d1", ["g1","d2","a1"], None],
+    'd2': ['open', 'noMill', 105, 245, "d2", ["d1","f2","d3","b2"], None],
+    'd3': ['open', 'noMill', 175, 245, "d3", ["d2","e3","c3"], None],
+    'd5': ['open', 'noMill', 315, 245, "d5", ["e5","d6","c5"], None],
+    'd6': ['open', 'noMill', 385, 245, "d6", ["d5","f6","d7","b6"], None],
+    'd7': ['open', 'noMill', 480, 245, "d7", ["d6","g7","a7"], None],
+    'c3': ['open', 'noMill', 175, 340, "c3", ["d3","c4"], None],
+    'c4': ['open', 'noMill', 245, 340, "c4", ["c3","c5","b4"], None],
+    'c5': ['open', 'noMill', 315, 340, "c5", ["c4","d5"], None],
+    'b2': ['open', 'noMill', 105, 410, "b2", ["d2","b4"], None],
+    'b4': ['open', 'noMill', 245, 410, "b4", ["b2","c4","a4","b6"], None],
+    'b6': ['open', 'noMill', 385, 410, "b6", ["b4","d6"], None],
+    'a1': ['open', 'noMill', 20, 480, "a1", ["a4","d1"], None],
+    'a4': ['open', 'noMill', 245, 480, "a4", ["a1","b4","a7"], None],
+    'a7': ['open', 'noMill', 480, 480, "a7", ["a4","d7"], None]
 }
 
 black = Player()
 white = Player()
 
 class Board(tk.Tk):
+
     def __init__(self):
         super().__init__()
 
@@ -150,7 +151,7 @@ class Board(tk.Tk):
         #add Buttons to dict
         for value in placements.values():
             #print(type(value))
-            value.append(tk.Button(board, text='O'))
+            value[6] = tk.Button(board, text='O')
 
         self.drawButtons(board, turn)
 
