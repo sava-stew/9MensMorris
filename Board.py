@@ -2,29 +2,14 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import *
 from tkinter.ttk import Label
-#from PIL import Image, ImageTk
 from Turn import Turn
 from Player import Player
+from tkinter import ttk, simpledialog
 
-#for index 0
-#open
-#white
-#black
-
-#for index 1
-#noMill
-#newMill
-#oldMill
-
-#when the button is pressed
-#need to get the variable name of button
-#variable name of the button will be the dictionary key
-#need to get player color
-#call function with player color and button name
-#function should access the key (button name) and change index[0] of list to player
+# ...
 
 placements = {
-    'g1': ['open', 'noMill', 20, 20], #g1 g4 and g7 are all the same color, you should change noMill to Mill for g1 g4 and g7
+    'g1': ['open', 'noMill', 20, 20],
     'g4': ['open', 'noMill', 245, 20],
     'g7': ['open', 'noMill', 480, 20],
     'f2': ['open', 'noMill', 105, 90],
@@ -83,7 +68,6 @@ class Board(tk.Tk):
             y1 += 25
 
     def banks(self):
-
         whiteBank = tk.Canvas(self, width=20)
         whiteBank.grid(column=0, row=1)
         self.createPieces(whiteBank, white.getBankPieces(), 20, 40, 'white')
@@ -92,13 +76,12 @@ class Board(tk.Tk):
         blackBank.grid(column=2, row=1)
         self.createPieces(blackBank, black.getBankPieces(), 20, 40, 'black')
 
-
     def replayOptions(self):
         replayOptions = tk.Canvas(self, width=400, height=80, bg='grey')
         replayOptions.grid(column=1, row=2)
 
         label = tk.Label(replayOptions, text='Game Replay')
-        replayOptions.create_window(200, 20,window=label)
+        replayOptions.create_window(200, 20, window=label)
 
         manReplay = tk.Button(replayOptions, text='Manual Replay')
         replayOptions.create_window(100, 50, window=manReplay)
@@ -110,14 +93,13 @@ class Board(tk.Tk):
         timeDelay = tk.Entry(replayOptions, textvariable=delay, width=3)
         replayOptions.create_window(340, 50, window=timeDelay)
 
-
     def createBoard(self):
         board = tk.Canvas(self, width=500, height=500, bg='#987554')
         board.grid(column=1, row=1)
 
         turn = Turn()
 
-        #draw lines
+        # draw lines
         board.create_line((20, 20), (480, 20), fill='black')
         board.create_line((105, 90), (385, 90), fill='black')
         board.create_line((175, 160), (315, 160), fill='black')
@@ -136,21 +118,14 @@ class Board(tk.Tk):
         board.create_line((315, 160), (315, 340), fill='black')
         board.create_line((245, 340), (245, 480), fill='black')
 
-        #draw board
-        #'O' button for open,
-        #black button for black
-        #white button for white
-        print(type(placements["g1"]))
-        #add Buttons to dict
+        # add Buttons to dict
         for value in placements.values():
-            print(type(value))
             value.append(tk.Button(board, text='O'))
 
         self.drawButtons(board, turn)
 
     def drawButtons(self, canvas, turn):
         for placement in placements.values():
-            #print(type(placement[4]))
             placement[4].config(command=lambda i=placement: Board.onButtonPress(self, i, canvas, turn))
             if placement[0] == "open":
                 canvas.create_window(placement[2], placement[3], window=placement[4])
@@ -168,14 +143,11 @@ class Board(tk.Tk):
         self.replayOptions()
 
     def onButtonPress(self, button, canvas, turn):
-        #print(button)
         if button[0] == "open" and turn.getTurn() == 'black' and black.getBankPieces() != 0:
-            #button.config(text="",height=3,width=5,bg="black")
             black.bankUpdate()
             button[0] = "black"
             turn.changeTurn()
         elif button[0] == "open" and turn.getTurn() == 'white' and white.getBankPieces() != 0:
-            #button.config(text="",height=3,width=5,bg="white")
             white.bankUpdate()
             button[0] = "white"
             turn.changeTurn()
@@ -206,10 +178,54 @@ class Board(tk.Tk):
                 placements[mill[0]][1] = "whiteMill"
                 placements[mill[1]][1] = "whiteMill"
                 placements[mill[2]][1] = "whiteMill"
+                print("White has a mill")
+                # Do something like removing the piece or updating the display
             elif placements[mill[0]][0] == "black" and placements[mill[1]][0] == "black" and placements[mill[2]][0] == "black":
                 placements[mill[0]][1] = "blackMill"
                 placements[mill[1]][1] = "blackMill"
                 placements[mill[2]][1] = "blackMill"
+                print("Black has a mill")
+                # Do something like removing the piece or updating the display
 
-        return
+    def move_piece(self, start_position, end_position):
+        # Check if the player has only 3 pieces left
+        if (black.getBankPieces() == 3 and Turn.getTurn() == 'black') or (
+                white.getBankPieces() == 3 and Turn.getTurn() == 'white'):
+            # Allow jumping to any open position
+            if placements[end_position][0] == "open":
+                # Move the piece to the new position
+                placements[end_position][0] = placements[start_position][0]
+                placements[start_position][0] = "open"
+                # Update the display and turn
+                Turn.changeTurn()
+                return
+        else:
+            # Existing movement logic can be placed here
+            # For example, you might check if the move is valid for normal play
+            pass  # Replace with actual movement logic if needed
 
+    def removeOpponentPiece(self, opponent_color):
+        opponent_pieces = [key for key, value in placements.items() if value[0] == opponent_color]
+
+        if not opponent_pieces:
+            print(f"No pieces to remove for {opponent_color}.")
+            return
+
+        piece_to_remove = simpledialog.askstring("Remove Piece",
+                                                 f"Select a piece to remove from {opponent_color}:\n" + "\n".join(
+                                                     opponent_pieces))
+
+        if piece_to_remove in opponent_pieces:
+            placements[piece_to_remove][0] = 'open'
+            placements[piece_to_remove][4].config(text="O", height=1, width=3, bg="SystemButtonFace")
+            print(f"Removed {opponent_color} piece at {piece_to_remove}.")
+        else:
+            print("Invalid piece selected.")
+
+        # Original move logic remains here
+        # ...
+
+# Initialize the board
+board = Board()
+board.setUp()
+board.mainloop()
