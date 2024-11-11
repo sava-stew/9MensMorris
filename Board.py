@@ -206,22 +206,29 @@ class Board(tk.Tk):
                  ('f6','d6','b6'),
                  ('g7','d7','a7')]
 
+        whiteMills = []
+        blackMills = []
+
         for mill in mills:
             if placements[mill[0]][0] == "white" and placements[mill[1]][0] == "white" and placements[mill[2]][0] == "white":
                 #if there is a mill, but it's not listed in the dictionary, it must have just been made.
                 #therefore, you get to remove a piece
                 if placements[mill[0]][1] != "whiteMill" or placements[mill[1]][1] != "whiteMill" or placements[mill[2]][1] != "whiteMill":
                     self.removeOpponentPiece("black")
-                placements[mill[0]][1] = "whiteMill"
-                placements[mill[1]][1] = "whiteMill"
-                placements[mill[2]][1] = "whiteMill"
+                whiteMills.append(mill)
             elif placements[mill[0]][0] == "black" and placements[mill[1]][0] == "black" and placements[mill[2]][0] == "black":
                 if placements[mill[0]][1] != "blackMill" or placements[mill[1]][1] != "blackMill" or placements[mill[2]][1] != "blackMill":
                     self.removeOpponentPiece("white")
-                placements[mill[0]][1] = "blackMill"
-                placements[mill[1]][1] = "blackMill"
-                placements[mill[2]][1] = "blackMill"
+                blackMills.append(mill)
 
+        for placement in placements.values():
+            #convert list of tuples to list, e.g. [(a,b,c)] -> [a,b,c]
+            if placement[4] in list(sum(whiteMills, ())):
+                placement[1] = "whiteMill"
+            elif placement[4] in list(sum(blackMills, ())):
+                placement[1] = "blackMill"
+            else:
+                placement[1] = "noMill"
         return
 
     def move_piece(self, from_pos, to_pos):
