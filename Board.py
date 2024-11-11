@@ -6,6 +6,7 @@ from Turn import Turn
 from Player import Player
 
 placements = {
+
     'g1': ['open', 'noMill', 20, 20, "g1", ["g4","d1"]],
     'g4': ['open', 'noMill', 245, 20, "g4", ["g1","g7","f4"]],
     'g7': ['open', 'noMill', 480, 20, "g7", ["g4","d4"]],
@@ -36,6 +37,7 @@ black = Player()
 white = Player()
 
 class Board(tk.Tk):
+
     def __init__(self):
         super().__init__()
 
