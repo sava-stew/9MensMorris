@@ -2,29 +2,11 @@ import tkinter as tk
 from tkinter import ttk, simpledialog
 from tkinter import *
 from tkinter.ttk import Label
-#from PIL import Image, ImageTk
 from Turn import Turn
 from Player import Player
 
-#for index 0
-#open
-#white
-#black
-
-#for index 1
-#noMill
-#newMill
-#oldMill
-
-#when the button is pressed
-#need to get the variable name of button
-#variable name of the button will be the dictionary key
-#need to get player color
-#call function with player color and button name
-#function should access the key (button name) and change index[0] of list to player
-
 placements = {
-    'g1': ['open', 'noMill', 20, 20, "g1", ["g4","d1"]], #g1 g4 and g7 are all the same color, you should change noMill to Mill for g1 g4 and g7
+    'g1': ['open', 'noMill', 20, 20, "g1", ["g4","d1"]],
     'g4': ['open', 'noMill', 245, 20, "g4", ["g1","g7","f4"]],
     'g7': ['open', 'noMill', 480, 20, "g7", ["g4","d4"]],
     'f2': ['open', 'noMill', 105, 90, "f2", ["f4","d2"]],
@@ -89,7 +71,6 @@ class Board(tk.Tk):
             y1 += 25
 
     def banks(self):
-
         whiteBank = tk.Canvas(self, width=20)
         whiteBank.grid(column=0, row=1)
         self.createPieces(whiteBank, white.getBankPieces(), 20, 40, 'white')
@@ -97,7 +78,6 @@ class Board(tk.Tk):
         blackBank = tk.Canvas(self, width=20)
         blackBank.grid(column=2, row=1)
         self.createPieces(blackBank, black.getBankPieces(), 20, 40, 'black')
-
 
     def replayOptions(self):
         replayOptions = tk.Canvas(self, width=400, height=80, bg='grey')
@@ -115,7 +95,6 @@ class Board(tk.Tk):
         delay = 2
         timeDelay = tk.Entry(replayOptions, textvariable=delay, width=3)
         replayOptions.create_window(340, 50, window=timeDelay)
-
 
     def createBoard(self):
         board = tk.Canvas(self, width=500, height=500, bg='#987554')
@@ -143,20 +122,14 @@ class Board(tk.Tk):
         board.create_line((245, 340), (245, 480), fill='black')
 
         #draw board
-        #'O' button for open,
-        #black button for black
-        #white button for white
-        #print(type(placements["g1"]))
         #add Buttons to dict
         for value in placements.values():
-            #print(type(value))
             value.append(tk.Button(board, text='O'))
 
         self.drawButtons(board, turn)
 
     def drawButtons(self, canvas, turn, origin=""):
         for placement in placements.values():
-            #print(type(placement[4]))
             placement[6].config(command=lambda i=placement: Board.onButtonPress(self, i, canvas, turn, origin))
             if placement[0] == "open":
                 canvas.create_window(placement[2], placement[3], window=placement[6])
@@ -175,8 +148,6 @@ class Board(tk.Tk):
         self.replayOptions()
 
     def onButtonPress(self, button, canvas, turn, origin):
-        print(button)
-
         whoseTurn = turn.getTurn()
         if whoseTurn == "white":
             bankPieces = white.getBankPieces()
@@ -186,50 +157,30 @@ class Board(tk.Tk):
             boardPieces = black.getPlayerPieces()
 
         if origin == "":
-
             #if the player still has pieces left in the bank, go in "place mode"
             if bankPieces != 0:
                 if button[0] == "open" and whoseTurn == 'black' and black.getBankPieces() != 0:
-                    #button.config(text="",height=3,width=5,bg="black")
                     black.bankUpdate()
                     button[0] = "black"
                     turn.changeTurn()
                 elif button[0] == "open" and whoseTurn == 'white' and white.getBankPieces() != 0:
-                    #button.config(text="",height=3,width=5,bg="white")
                     white.bankUpdate()
                     button[0] = "white"
                     turn.changeTurn()
-
             #if the player has more than 3 pieces left on the board, go in "move mode"
             else:
-                #check turn
-                #if color matches turn, reconfigure adjacent buttons into target mode
                 if button[0] == whoseTurn:
                     origin = button[4]
-                #if pressed button = valid move, move piece
-                #elif button
-                #to_pos = simpledialog.askstring("Move a Piece",
-                #                                         f"Select a space to move to:\n" + "\n".join(
-                #                                             button[5]))
-                #self.move_piece(button[4],to_pos)
-
-                #if the player has only 3 pieces left, go in "fly mode"
-                #elif boardPieces <= 3:
-                #to_pos = simpledialog.askstring("Move a Piece",
-                #                                f"Select a space to move to:\n" + "\n".join(
-                #                                    placements))
-                #self.move_piece(button[4], to_pos)
         elif boardPieces > 3:
             if button[4] in placements[origin][5]:
                 if self.move_piece(origin, button[4]):
                     origin = ""
                     turn.changeTurn()
-
         else:
-            print("fly mode activated")
             if self.move_piece(origin, button[4]):
                 origin = ""
                 turn.changeTurn()
+
         self.currentTurn(turn.getTurn())
         self.banks()
         self.checkMills()
