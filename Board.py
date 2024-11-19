@@ -159,7 +159,6 @@ class Board(tk.Tk):
             boardPieces = black.getPlayerPieces()
 
         if origin == "":
-            #if the player still has pieces left in the bank, go in "place mode"
             if bankPieces != 0:
                 if button[0] == "open" and whoseTurn == 'black' and black.getBankPieces() != 0:
                     black.bankUpdate()
@@ -169,19 +168,20 @@ class Board(tk.Tk):
                     white.bankUpdate()
                     button[0] = "white"
                     turn.changeTurn()
-            #if the player has more than 3 pieces left on the board, go in "move mode"
             else:
                 if button[0] == whoseTurn:
                     origin = button[4]
-        elif boardPieces > 3:
-            if button[4] in placements[origin][5]:
+        else:
+            if button[0] == whoseTurn:
+                origin = button[4]
+            elif boardPieces > 3 and button[4] in placements[origin][5]:
                 if self.move_piece(origin, button[4]):
                     origin = ""
                     turn.changeTurn()
-        else:
-            if self.move_piece(origin, button[4]):
-                origin = ""
-                turn.changeTurn()
+            elif boardPieces <= 3:
+                if self.move_piece(origin, button[4]):
+                    origin = ""
+                    turn.changeTurn()
 
         self.currentTurn(turn.getTurn())
         self.banks()
@@ -189,31 +189,31 @@ class Board(tk.Tk):
         self.drawButtons(canvas, turn, origin)
 
     def checkMills(self):
-        mills = [('g1','g4','g7'),
-                 ('f2','f4','f6'),
-                 ('e3','e4','e5'),
-                 ('d1','d2','d3'),
-                 ('d5','d6','d7'),
-                 ('c3','c4','c5'),
-                 ('b2','b4','b6'),
-                 ('a1','a4','a7'),
-                 ('g1','d1','a1'),
-                 ('f2','d2','b2'),
-                 ('e3','d3','c3'),
-                 ('g4','f4','e4'),
-                 ('c4','b4','a4'),
-                 ('e5','d5','c5'),
-                 ('f6','d6','b6'),
-                 ('g7','d7','a7')]
+        mills = [('g1', 'g4', 'g7'),
+                 ('f2', 'f4', 'f6'),
+                 ('e3', 'e4', 'e5'),
+                 ('d1', 'd2', 'd3'),
+                 ('d5', 'd6', 'd7'),
+                 ('c3', 'c4', 'c5'),
+                 ('b2', 'b4', 'b6'),
+                 ('a1', 'a4', 'a7'),
+                 ('g1', 'd1', 'a1'),
+                 ('f2', 'd2', 'b2'),
+                 ('e3', 'd3', 'c3'),
+                 ('g4', 'f4', 'e4'),
+                 ('c4', 'b4', 'a4'),
+                 ('e5', 'd5', 'c5'),
+                 ('f6', 'd6', 'b6'),
+                 ('g7', 'd7', 'a7')]
 
         whiteMills = []
         blackMills = []
 
         for mill in mills:
-            if placements[mill[0]][0] == "white" and placements[mill[1]][0] == "white" and placements[mill[2]][0] == "white":
-                #if there is a mill, but it's not listed in the dictionary, it must have just been made.
-                #therefore, you get to remove a piece
-                if placements[mill[0]][1] != "whiteMill" or placements[mill[1]][1] != "whiteMill" or placements[mill[2]][1] != "whiteMill":
+            if placements[mill[0]][0] == "white" and placements[mill[1]][0] == "white" and placements[mill[2]][
+                0] == "white":
+                if placements[mill[0]][1] != "whiteMill" or placements[mill[1]][1] != "whiteMill" or \
+                        placements[mill[2]][1] != "whiteMill":
                     self.removeOpponentPiece("black")
                 whiteMills.append(mill)
             elif placements[mill[0]][0] == "black" and placements[mill[1]][0] == "black" and placements[mill[2]][0] == "black":
@@ -251,17 +251,20 @@ class Board(tk.Tk):
             return False
 
     def removeOpponentPiece(self, opponent_color):
-        opponent_pieces = [key for key, value in placements.items() if value[0] == opponent_color]
+        removable_pieces = [key for key, value in placements.items() if
+                            value[0] == opponent_color and value[1] != f"{opponent_color}Mill"]
+        if not removable_pieces:
+            removable_pieces = [key for key, value in placements.items() if value[0] == opponent_color]
 
-        if not opponent_pieces:
+        if not removable_pieces:
             print(f"No pieces to remove for {opponent_color}.")
             return
 
         piece_to_remove = simpledialog.askstring("Remove Piece",
                                                  f"Select a piece to remove from {opponent_color}:\n" + "\n".join(
-                                                     opponent_pieces))
+                                                     removable_pieces))
 
-        if piece_to_remove in opponent_pieces:
+        if piece_to_remove in removable_pieces:
             placements[piece_to_remove][0] = 'open'
             placements[piece_to_remove][6].config(text="O", height=1, width=3, bg="SystemButtonFace")
             if opponent_color == "white":
