@@ -3,6 +3,10 @@ class Player():
         self.bankPieces = 9
         self.playerPieces = 9
 
+    def setPieces(self, num):
+        self.bankPieces = num
+        self.playerPieces = num
+
     def bankUpdate(self):
         self.bankPieces -= 1
 
