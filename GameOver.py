@@ -1,9 +1,14 @@
 import tkinter as tk
+from Replay import Replay
 
 class GameOver():
     #function added to avoid clicking close button for each window opened
     def quit(self):
         quit()
+
+    def replay(self):
+        replay = Replay()
+        replay.replay()
 
     def gameOverWindow(self, player):
         window=tk.Tk()
@@ -28,8 +33,17 @@ class GameOver():
         winner = tk.Label(window, text=player + ' player has won!')
         winner.grid(column=1, row=0)
 
-        quit = tk.Button(window, text='Close', command=self.quit)
-        quit.grid(column=1, row=1)
+        options = tk.Canvas(window)
+        options.columnconfigure(0, weight=1)
+        options.columnconfigure(1, weight=1)
+        options.rowconfigure(0, weight=1)
+        options.grid(column=1, row=1)
+
+        quit = tk.Button(options, text='Close', command=self.quit)
+        quit.grid(column=0, row=0)
+
+        replay = tk.Button(options, text="Watch Replay", command=self.replay)
+        replay.grid(column=1, row=0)
 
         #overrides default exit button to close all windows
         window.protocol("WM_DELETE_WINDOW", self.quit)

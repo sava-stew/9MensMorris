@@ -14,16 +14,20 @@ game = GameOver()
 class Board(tk.Tk):
     placements = {}
     mills = []
-
+    gameType = 0
 
     def __init__(self, setUp):
         super().__init__()
         self.placements = dict(setUp.placements)
         self.mills = list(setUp.mills)
-        black.setPieces(setUp.numPieces)
-        white.setPieces(setUp.numPieces)
+        self.gameType = setUp.gameType
+        black.setPieces(self.gameType)
+        white.setPieces(self.gameType)
+        gamefile = open('gamefile.txt', 'w')
+        gamefile.close()
+
         title = ' Men\'s Morris'
-        if (setUp.numPieces == 9):
+        if (self.gameType == 9):
             title = 'Nine' + title
         else:
             title = 'Twelve' + title
@@ -44,6 +48,9 @@ class Board(tk.Tk):
         self.rowconfigure(2, weight=2)
 
         self.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
+
+        #overrides default exit button to close all windows
+        self.protocol("WM_DELETE_WINDOW", self.quit)
 
     def currentTurn(self, turn):
         currentTurn = tk.Label(self, text='Current turn: ' + turn)
@@ -66,6 +73,7 @@ class Board(tk.Tk):
         self.createPieces(blackBank, black.getBankPieces(), 20, 40, 'black')
 
     def replayOptions(self):
+        delay = IntVar()
         replayOptions = tk.Canvas(self, width=400, height=80, bg='grey')
         replayOptions.grid(column=1, row=2)
 
@@ -75,12 +83,21 @@ class Board(tk.Tk):
         manReplay = tk.Button(replayOptions, text='Manual Replay')
         replayOptions.create_window(100, 50, window=manReplay)
 
+        options = [
+            2,
+            4,
+            6,
+            8,
+            10
+        ]
+
+        delay.set(2)
+
+        drop = ttk.OptionMenu(replayOptions, delay, options[0], *options)
+        replayOptions.create_window(340, 50, window=drop)
+
         autoReplay = tk.Button(replayOptions, text='Auto Replay')
         replayOptions.create_window(290, 50, window=autoReplay)
-
-        delay = 2
-        timeDelay = tk.Entry(replayOptions, textvariable=delay, width=3)
-        replayOptions.create_window(340, 50, window=timeDelay)
 
     def createBoard(self):
         board = tk.Canvas(self, width=500, height=500, bg='#987554')
@@ -106,6 +123,12 @@ class Board(tk.Tk):
         board.create_line((175, 160), (175, 340), fill='black')
         board.create_line((315, 160), (315, 340), fill='black')
         board.create_line((245, 340), (245, 480), fill='black')
+
+        if (self.gameType == 12):
+            board.create_line((20, 20), (175, 160), fill='black')
+            board.create_line((480, 20), (315, 160), fill='black')
+            board.create_line((20, 480), (175, 340), fill='black')
+            board.create_line((480, 480), (315, 340), fill='black')
 
         #draw board
         #add Buttons to dict
@@ -133,7 +156,7 @@ class Board(tk.Tk):
         self.createBoard()
         self.currentTurn('white')
         self.banks()
-        self.replayOptions()
+        #self.replayOptions()
 
     def onButtonPress(self, button, canvas, turn, origin):
         whoseTurn = turn.getTurn()
@@ -149,10 +172,12 @@ class Board(tk.Tk):
                 if button[0] == "open" and whoseTurn == 'black' and black.getBankPieces() != 0:
                     black.bankUpdate()
                     button[0] = "black"
+                    self.writeToFile(whoseTurn + ': ' + button[4] + '\n')
                     turn.changeTurn()
                 elif button[0] == "open" and whoseTurn == 'white' and white.getBankPieces() != 0:
                     white.bankUpdate()
                     button[0] = "white"
+                    self.writeToFile(whoseTurn + ': ' + button[4] + '\n')
                     turn.changeTurn()
             else:
                 if button[0] == whoseTurn:
@@ -162,10 +187,13 @@ class Board(tk.Tk):
                 origin = button[4]
             elif boardPieces > 3 and button[4] in self.placements[origin][5]:
                 if self.move_piece(origin, button[4]):
+                    self.writeToFile(whoseTurn + ': ' + origin + ' to ' + button[4] + '\n')
                     origin = ""
                     turn.changeTurn()
             elif boardPieces <= 3:
                 if self.move_piece(origin, button[4]):
+                    self.writeToFile(whoseTurn + ': ' + origin + ' to ' + button[4] + '\n')
+
                     origin = ""
                     turn.changeTurn()
 
@@ -187,10 +215,12 @@ class Board(tk.Tk):
                 0] == "white":
                 if self.placements[mill[0]][1] != "whiteMill" or self.placements[mill[1]][1] != "whiteMill" or \
                         self.placements[mill[2]][1] != "whiteMill":
+                    self.writeToFile('white mill: ' + self.placements[mill[0]][4] + ', ' + self.placements[mill[1]][4] + ', ' + self.placements[mill[2]][4] + '\n')
                     self.removeOpponentPiece("black")
                 whiteMills.append(mill)
             elif self.placements[mill[0]][0] == "black" and self.placements[mill[1]][0] == "black" and self.placements[mill[2]][0] == "black":
                 if self.placements[mill[0]][1] != "blackMill" or self.placements[mill[1]][1] != "blackMill" or self.placements[mill[2]][1] != "blackMill":
+                    self.writeToFile('black mill: ' + self.placements[mill[0]][4] + ', ' + self.placements[mill[1]][4] + ', ' + self.placements[mill[2]][4] + '\n')
                     self.removeOpponentPiece("white")
                 blackMills.append(mill)
 
@@ -211,6 +241,15 @@ class Board(tk.Tk):
             return False
 
         if self.placements[from_pos][0] != 'open' and self.placements[to_pos][0] == 'open':
+
+            if self.gameType == 9:
+                if to_pos not in self.placements[from_pos][5]:
+                    print(f"Invalid move for 9 Men's Morris: {to_pos} is not directly connected to {from_pos}.")
+                    return False
+                elif self.gameType == 12:
+                    if to_pos not in self.placements[from_pos][5]:
+                        print(f"Invalid move for 12 Men's Morris: {to_pos} is not connected to {from_pos}.")
+                        return False
 
             self.placements[to_pos][0] = self.placements[from_pos][0]
             self.placements[to_pos][6].config(text="", height=3, width=5, bg=self.placements[to_pos][0])
@@ -242,9 +281,11 @@ class Board(tk.Tk):
             self.placements[piece_to_remove][6].config(text="O", height=1, width=3, bg="SystemButtonFace")
             if opponent_color == "white":
                 white.pieceUpdate()
+                self.writeToFile('black removed: ' + piece_to_remove + '\n')
             elif opponent_color == "black":
                 black.pieceUpdate()
-            print(f"Removed {opponent_color} piece at {piece_to_remove}.")
+                self.writeToFile('white removed: ' + piece_to_remove + '\n')
+            #print(f"Removed {opponent_color} piece at {piece_to_remove}.")
         else:
             print("Check" + "Invalid piece selected.")
 
@@ -252,3 +293,9 @@ class Board(tk.Tk):
         print("it's the computer's turn")
         choice = random.choice(list(self.placements.keys()))
         self.onButtonPress(self.placements[choice], canvas, turn, origin)
+        
+    def writeToFile(self, turnInfo):
+        self.gamefile = open('gamefile.txt', 'a')
+        self.gamefile.write(turnInfo)
+        self.gamefile.close()
+

@@ -1,0 +1,31 @@
+white: d3
+black: d5
+white: e3
+black: e5
+white: c3
+white mill: e3, d3, c3
+white removed: d5
+black: c5
+white: d2
+black: d5
+black mill: e5, d5, c5
+black removed: d2
+white: f2
+black: f6
+white: g1
+black: g7
+white: d2
+black: d6
+white: b2
+white mill: f2, d2, b2
+white removed: g7
+black: b6
+black mill: f6, d6, b6
+black removed: g1
+white: d1
+white mill: d1, d2, d3
+white removed: b6
+black: b6
+black mill: f6, d6, b6
+black removed: d1
+white: b2 to b4
