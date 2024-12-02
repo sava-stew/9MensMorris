@@ -6,6 +6,7 @@ from Turn import Turn
 from Player import Player
 from GameOver import GameOver
 
+
 black = Player()
 white = Player()
 game = GameOver()
@@ -14,18 +15,15 @@ class Board(tk.Tk):
     placements = {}
     mills = []
 
-
-    def __init__(self, setUp):
+    def __init__(self, setUp, game_type):
         super().__init__()
         self.placements = dict(setUp.placements)
         self.mills = list(setUp.mills)
-        black.setPieces(setUp.numPieces)
-        white.setPieces(setUp.numPieces)
-        title = ' Men\'s Morris'
-        if (setUp.numPieces == 9):
-            title = 'Nine' + title
-        else:
-            title = 'Twelve' + title
+        self.game_type = game_type
+        black.setPieces(game_type)
+        white.setPieces(game_type)
+
+        title = 'Nine Men\'s Morris' if game_type == 9 else 'Twelve Men\'s Morris'
         self.title(title)
 
         window_width = 900
@@ -202,13 +200,25 @@ class Board(tk.Tk):
         return
 
     def move_piece(self, from_pos, to_pos):
-
         if from_pos not in self.placements or to_pos not in self.placements:
             print(f"Position {from_pos} or {to_pos} does not exist.")
             return False
 
+        # 检查起始位置和目标位置的状态
         if self.placements[from_pos][0] != 'open' and self.placements[to_pos][0] == 'open':
+            # 根据游戏类型检查是否可以移动
+            if self.game_type == 9:
+                # 检查是否在合法的直线连接范围内
+                if to_pos not in self.placements[from_pos][5]:  # [5] 存储合法连接的点
+                    print(f"Invalid move for 9 Men's Morris: {to_pos} is not directly connected to {from_pos}.")
+                    return False
+            elif self.game_type == 12:
+                # 检查是否在合法的连接范围内（包括直线和斜线）
+                if to_pos not in self.placements[from_pos][5]:
+                    print(f"Invalid move for 12 Men's Morris: {to_pos} is not connected to {from_pos}.")
+                    return False
 
+            # 执行移动
             self.placements[to_pos][0] = self.placements[from_pos][0]
             self.placements[to_pos][6].config(text="", height=3, width=5, bg=self.placements[to_pos][0])
 
