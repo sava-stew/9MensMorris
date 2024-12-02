@@ -5,6 +5,7 @@ from tkinter.ttk import Label
 from Turn import Turn
 from Player import Player
 from GameOver import GameOver
+import random
 
 black = Player()
 white = Player()
@@ -102,7 +103,7 @@ class Board(tk.Tk):
         board = tk.Canvas(self, width=500, height=500, bg='#987554')
         board.grid(column=1, row=1)
 
-        turn = Turn()
+        turn = Turn(game_type="computer")
 
         #draw lines
         board.create_line((20, 20), (480, 20), fill='black')
@@ -147,6 +148,8 @@ class Board(tk.Tk):
             elif placement[0] == "black":
                 placement[6].config(text="", height=3, width=5, bg="black")
                 canvas.create_window(placement[2], placement[3], window=placement[6])
+        if turn.getTurnType() == "computer":
+            self.AutoPlay(canvas, turn, origin)
         return
 
     def setUp(self):
@@ -286,7 +289,13 @@ class Board(tk.Tk):
         else:
             print("Check" + "Invalid piece selected.")
 
+    def AutoPlay(self, canvas, turn, origin):
+        print("it's the computer's turn")
+        choice = random.choice(list(self.placements.keys()))
+        self.onButtonPress(self.placements[choice], canvas, turn, origin)
+        
     def writeToFile(self, turnInfo):
         self.gamefile = open('gamefile.txt', 'a')
         self.gamefile.write(turnInfo)
         self.gamefile.close()
+
