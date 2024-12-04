@@ -16,6 +16,7 @@ class Board(tk.Tk):
     mills = []
     gameType = 0
 
+
     def __init__(self, setUp):
         super().__init__()
         self.placements = dict(setUp.placements)
@@ -103,7 +104,7 @@ class Board(tk.Tk):
         board = tk.Canvas(self, width=500, height=500, bg='#987554')
         board.grid(column=1, row=1)
 
-        turn = Turn(game_type="computer")
+        turn = Turn()
 
         #draw lines
         board.create_line((20, 20), (480, 20), fill='black')
