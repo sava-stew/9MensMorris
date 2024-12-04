@@ -242,15 +242,6 @@ class Board(tk.Tk):
 
         if self.placements[from_pos][0] != 'open' and self.placements[to_pos][0] == 'open':
 
-            if self.gameType == 9:
-                if to_pos not in self.placements[from_pos][5]:
-                    print(f"Invalid move for 9 Men's Morris: {to_pos} is not directly connected to {from_pos}.")
-                    return False
-                elif self.gameType == 12:
-                    if to_pos not in self.placements[from_pos][5]:
-                        print(f"Invalid move for 12 Men's Morris: {to_pos} is not connected to {from_pos}.")
-                        return False
-
             self.placements[to_pos][0] = self.placements[from_pos][0]
             self.placements[to_pos][6].config(text="", height=3, width=5, bg=self.placements[to_pos][0])
 
