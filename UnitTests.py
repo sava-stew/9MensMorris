@@ -10,9 +10,8 @@ from Turn import Turn
 class TestMovePiece(unittest.TestCase):
 
     def setUp(self):
-        # 初始化 SetUp 实例（假设它是一个类）
-        self.setUpInstance = SetUp()  # 替换为您的 SetUp 实例化逻辑
-        self.board = Board(self.setUpInstance)  # 创建 Board 实例并传入 setUpInstance
+        self.board = Board(SetUp)
+        self.placements = self.board.placements
 
     def test_invalid_from_pos(self):
         self.assertNotIn("g2", self.placements)
