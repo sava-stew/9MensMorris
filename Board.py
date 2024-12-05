@@ -134,7 +134,7 @@ class Board(tk.Tk):
         #draw board
         #add Buttons to dict
         for value in self.placements.values():
-            value.append(tk.Button(board, text='O'))
+            value[6] = (tk.Button(board, text='O'))
 
         self.drawButtons(board, turn)
 

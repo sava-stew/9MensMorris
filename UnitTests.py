@@ -5,46 +5,49 @@ from GameOver import GameOver
 from SetUp import SetUp
 from Turn import Turn
 
-
+setup = SetUp()
+board = Board(setup)
+placements = setup.nineMensPlacements
 
 class TestMovePiece(unittest.TestCase):
 
-    def setUp(self):
-        self.board = Board(SetUp)
-        self.placements = self.board.placements
+    #def setUp(self):
+    #    self.board = Board(SetUp)
+    #    self.placements = self.board.placements
 
     def test_invalid_from_pos(self):
-        self.assertNotIn("g2", self.placements)
-        self.assertFalse(self.board.move_piece("g2", "g4"))
+        self.assertNotIn("g2", placements)
+        self.assertFalse(board.move_piece("g2", "g4"))
 
     def test_invalid_to_pos(self):
-        self.assertNotIn("g3", self.placements)
-        self.assertFalse(self.board.move_piece("g1", "g3"))
+        self.assertNotIn("g3", placements)
+        self.assertFalse(board.move_piece("g1", "g3"))
 
     def test_empty_from_pos(self):
-        self.setUpBoard(9)  # 选择9人棋盘
-        self.placements["g1"][0] = "open"  # 访问 'g1' 键
-        self.placements["g1"][0] = "open"
-        self.assertFalse(self.board.move_piece("g1", "g4"))
+        setup.setUpBoard(9)  # 选择9人棋盘
+        placements["g1"][0] = "open"  # 访问 'g1' 键
+        placements["g1"][0] = "open"
+        self.assertFalse(board.move_piece("g1", "g4"))
 
     def test_occupied_to_pos(self):
-        self.placements["g4"][0] = "white"
-        self.assertFalse(self.board.move_piece("g1", "g4"))
-        self.placements["g4"][0] = "open"
+        placements["g4"][0] = "white"
+        self.assertFalse(board.move_piece("g1", "g4"))
+        placements["g4"][0] = "open"
 
     def test_valid_move(self):
 
-        self.placements["g1"][0] = "white"
-        self.placements["g4"][6] = tk.Button()
-        self.placements["g1"][6] = tk.Button()
-        self.assertEqual(self.placements["g4"][0], "open")
-        self.assertTrue(self.board.move_piece("g1", "g4"))
-        self.placements["g1"][0] = "open"
-        self.placements["g4"][6] = None
-        self.placements["g1"][6] = None
+        placements["g1"][0] = "white"
+        placements["g4"][6] = tk.Button()
+        placements["g1"][6] = tk.Button()
+        self.assertEqual(placements["g4"][0], "open")
+        self.assertTrue(board.move_piece("g1", "g4"))
+        placements["g1"][0] = "open"
+        placements["g4"][6] = None
+        placements["g1"][6] = None
 
 
 class TestSettingUpGame(unittest.TestCase):
+    '''
     def setUp(self):
         self.board = Board(SetUp)
         self.board.gameType = 9
@@ -53,10 +56,10 @@ class TestSettingUpGame(unittest.TestCase):
             "a4": ["open", "noMill", 20, 245, "a4", ["a1", "a7"], None],
         }
         self.board.setUp()
-
+    '''
     def test_initial_setup(self):
-        self.assertEqual(self.board.gameType, 9)
-        self.assertTrue(all(pos[0] == "open" for pos in self.board.placements.values()))
+        self.assertEqual(board.gameType, 9)
+        self.assertTrue(all(pos[0] == "open" for pos in board.placements.values()))
         self.assertEqual(white.getBankPieces(), 9)
         self.assertEqual(black.getBankPieces(), 9)
 
