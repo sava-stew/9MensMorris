@@ -4,6 +4,7 @@ class SetUp():
     gameType = 9
     placements = {}
     mills = []
+    opponent = ""
 
     nineMensPlacements = {
         'g1': ['open', 'noMill', 20, 20, "g1", ["g4","d1"]],
@@ -101,8 +102,9 @@ class SetUp():
     def quit(self):
         quit()
 
-    def setUpBoard(self, num):
+    def setUpBoard(self, num, opponent):
         self.gameType = num
+        self.opponent = opponent
         if self.gameType == 9:
             self.placements = self.nineMensPlacements
             self.mills = self.nineMensMills
@@ -142,9 +144,16 @@ class SetUp():
         options.rowconfigure(0, weight=1)
         options.grid(column=1, row=1)
 
-        nineMens = tk.Button(options, text='9 Mens Morris', command=lambda: [self.setUpBoard(9), self.closeWindow(window)])
+        var = tk.StringVar()
+        var.set("human")
+        vsHuman = tk.Radiobutton(options, text="Vs. Human", variable=var, value="human")
+        vsHuman.grid(column=0, row=1)
+        vsComputer = tk.Radiobutton(options, text="Vs. Computer", variable=var, value="computer")
+        vsComputer.grid(column=1, row=1)
+
+        nineMens = tk.Button(options, text='9 Mens Morris', command=lambda: [self.setUpBoard(9, var.get()), self.closeWindow(window)])
         nineMens.grid(column=0, row=0)
-        twelveMens = tk.Button(options, text='12 Mens Morris', command=lambda: [self.setUpBoard(12), self.closeWindow(window)])
+        twelveMens = tk.Button(options, text='12 Mens Morris', command=lambda: [self.setUpBoard(12, var.get()), self.closeWindow(window)])
         twelveMens.grid(column=1, row=0)
 
         window.protocol("WM_DELETE_WINDOW", self.quit)
