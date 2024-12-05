@@ -139,8 +139,17 @@ class Board(tk.Tk):
         self.drawButtons(board, turn)
 
     def drawButtons(self, canvas, turn, origin=""):
+        if canvas is None:
+            raise ValueError("Canvas is None! Ensure it's properly initialized.")
+
+        print(f"Canvas: {canvas}")  # 输出 canvas 对象，检查它是否有效
+
         for placement in self.placements.values():
+            if placement[6] is None:
+                placement[6] = tk.Button(canvas)  # 确保按钮是有效的
+
             placement[6].config(command=lambda i=placement: Board.onButtonPress(self, i, canvas, turn, origin))
+
             if placement[0] == "open":
                 canvas.create_window(placement[2], placement[3], window=placement[6])
             elif placement[0] == "white":
@@ -149,6 +158,7 @@ class Board(tk.Tk):
             elif placement[0] == "black":
                 placement[6].config(text="", height=3, width=5, bg="black")
                 canvas.create_window(placement[2], placement[3], window=placement[6])
+
         if turn.getTurnType() == "computer":
             self.AutoPlay(canvas, turn, origin)
         return
@@ -160,7 +170,14 @@ class Board(tk.Tk):
         #self.replayOptions()
 
     def onButtonPress(self, button, canvas, turn, origin):
+        # 确保 canvas 是有效的
+        if canvas is None:
+            raise ValueError("Canvas is None! Ensure it's properly initialized.")
+
+        # 获取当前回合
         whoseTurn = turn.getTurn()
+
+        # 根据回合选择玩家的棋子
         if whoseTurn == "white":
             bankPieces = white.getBankPieces()
             boardPieces = white.getPlayerPieces()
@@ -168,40 +185,49 @@ class Board(tk.Tk):
             bankPieces = black.getBankPieces()
             boardPieces = black.getPlayerPieces()
 
+        # 如果 origin 为空，则尝试放置棋子
         if origin == "":
             if bankPieces != 0:
-                if button[0] == "open" and whoseTurn == 'black' and black.getBankPieces() != 0:
-                    black.bankUpdate()
-                    button[0] = "black"
-                    self.writeToFile(whoseTurn + ': ' + button[4] + '\n')
-                    turn.changeTurn()
-                elif button[0] == "open" and whoseTurn == 'white' and white.getBankPieces() != 0:
-                    white.bankUpdate()
-                    button[0] = "white"
-                    self.writeToFile(whoseTurn + ': ' + button[4] + '\n')
-                    turn.changeTurn()
+                if button[0] == "open":
+                    # 白色棋子或黑色棋子的放置逻辑
+                    if whoseTurn == "black" and black.getBankPieces() != 0:
+                        black.bankUpdate()
+                        button[0] = "black"
+                        self.writeToFile(whoseTurn + ': ' + button[4] + '\n')
+                        turn.changeTurn()
+                    elif whoseTurn == "white" and white.getBankPieces() != 0:
+                        white.bankUpdate()
+                        button[0] = "white"
+                        self.writeToFile(whoseTurn + ': ' + button[4] + '\n')
+                        turn.changeTurn()
             else:
+                # 如果没有棋子，则尝试更改棋子位置
                 if button[0] == whoseTurn:
-                    origin = button[4]
+                    origin = button[4]  # 更新起始位置
         else:
+            # 当 origin 非空时，尝试移动棋子
             if button[0] == whoseTurn:
-                origin = button[4]
+                origin = button[4]  # 更新起始位置
             elif boardPieces > 3 and button[4] in self.placements[origin][5]:
                 if self.move_piece(origin, button[4]):
                     self.writeToFile(whoseTurn + ': ' + origin + ' to ' + button[4] + '\n')
-                    origin = ""
+                    origin = ""  # 移动后清空 origin
                     turn.changeTurn()
             elif boardPieces <= 3:
                 if self.move_piece(origin, button[4]):
                     self.writeToFile(whoseTurn + ': ' + origin + ' to ' + button[4] + '\n')
-
-                    origin = ""
+                    origin = ""  # 移动后清空 origin
                     turn.changeTurn()
 
+        # 更新界面
         self.currentTurn(turn.getTurn())
         self.banks()
         self.checkMills()
+
+        # 确保 canvas 被正确传递给 drawButtons
         self.drawButtons(canvas, turn, origin)
+
+        # 检查游戏是否结束
         game.gameOver(black.getPlayerPieces(), white.getPlayerPieces())
 
     def checkMills(self):
@@ -264,31 +290,48 @@ class Board(tk.Tk):
             return False
 
     def removeOpponentPiece(self, opponent_color):
+        # 获取所有可以移除的棋子，排除已形成"mill"的棋子
         removable_pieces = [key for key, value in self.placements.items() if
                             value[0] == opponent_color and value[1] != f"{opponent_color}Mill"]
+
+        # 如果没有可移除的棋子，尝试移除所有棋子
         if not removable_pieces:
             removable_pieces = [key for key, value in self.placements.items() if value[0] == opponent_color]
 
+        # 如果没有棋子可移除，打印提示信息并返回
         if not removable_pieces:
             print(f"No pieces to remove for {opponent_color}.")
             return
 
+        # 使用弹窗让用户选择移除的棋子
         piece_to_remove = simpledialog.askstring("Remove Piece",
                                                  f"Select a piece to remove from {opponent_color}:\n" + "\n".join(
                                                      removable_pieces))
 
-        if piece_to_remove in removable_pieces:
-            self.placements[piece_to_remove][0] = 'open'
-            self.placements[piece_to_remove][6].config(text="O", height=1, width=3, bg="SystemButtonFace")
-            if opponent_color == "white":
-                white.pieceUpdate()
-                self.writeToFile('black removed: ' + piece_to_remove + '\n')
-            elif opponent_color == "black":
-                black.pieceUpdate()
-                self.writeToFile('white removed: ' + piece_to_remove + '\n')
-            #print(f"Removed {opponent_color} piece at {piece_to_remove}.")
-        else:
-            print("Check" + "Invalid piece selected.")
+        # 如果用户输入无效，给出提示并返回
+        if not piece_to_remove or piece_to_remove not in removable_pieces:
+            print(f"Invalid or empty piece selected: {piece_to_remove}.")
+            return
+
+        # 更新棋盘上的位置为 'open'，表示棋子已被移除
+        self.placements[piece_to_remove][0] = 'open'
+
+        # 确保该位置有关联的 Tkinter 按钮并更新其显示
+        if len(self.placements[piece_to_remove]) > 6:  # 确保索引 6 存在，避免索引错误
+            button = self.placements[piece_to_remove][6]
+            if button:
+                button.config(text="O", height=1, width=3, bg="SystemButtonFace")
+
+        # 更新玩家的棋子数量
+        if opponent_color == "white":
+            white.pieceUpdate()  # 更新白色玩家的棋子数量
+            self.writeToFile(f'black removed: {piece_to_remove}\n')  # 记录动作到文件
+        elif opponent_color == "black":
+            black.pieceUpdate()  # 更新黑色玩家的棋子数量
+            self.writeToFile(f'white removed: {piece_to_remove}\n')  # 记录动作到文件
+
+        # 打印移除棋子的日志
+        print(f"Removed {opponent_color} piece at {piece_to_remove}.")
 
     def AutoPlay(self, canvas, turn, origin):
         print("it's the computer's turn")
