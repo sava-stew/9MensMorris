@@ -13,12 +13,14 @@ white = Player()
 game = GameOver()
 
 class Board(tk.Tk):
+
     def __init__(self, setUp):
         super().__init__()
         self.configure = setUp
         self.placements = dict(self.configure.placements)
         self.mills = list(self.configure.mills)
         self.gameType = self.configure.gameType
+        
         black.setPieces(self.gameType)
         white.setPieces(self.gameType)
         gamefile = open('gamefile.txt', 'w')
@@ -101,8 +103,7 @@ class Board(tk.Tk):
         board = tk.Canvas(self, width=500, height=500, bg='#987554')
         board.grid(column=1, row=1)
 
-        #turn = Turn(game_type="computer")
-        turn = Turn()
+        turn = Turn(game_type=self.opponent)
 
         #draw lines
         board.create_line((20, 20), (480, 20), fill='black')
@@ -156,6 +157,7 @@ class Board(tk.Tk):
         self.banks()
 
     def onButtonPress(self, button, canvas, turn, origin):
+        turn_complete = False
         whoseTurn = turn.getTurn()
         if whoseTurn == "white":
             bankPieces = white.getBankPieces()
@@ -186,17 +188,18 @@ class Board(tk.Tk):
                 if self.move_piece(origin, button[4]):
                     self.writeToFile(whoseTurn + ':move ' + origin + '-' + button[4] + '\n')
                     origin = ""
-                    turn.changeTurn()
+                    turn_complete = True
             elif boardPieces <= 3:
                 if self.move_piece(origin, button[4]):
                     self.writeToFile(whoseTurn + ':move ' + origin + '-' + button[4] + '\n')
-
                     origin = ""
-                    turn.changeTurn()
+                    turn_complete = True
 
+        self.checkMills(turn)
+        if turn_complete:
+            turn.changeTurn()
         self.currentTurn(turn.getTurn())
         self.banks()
-        self.checkMills()
         self.drawButtons(canvas, turn, origin)
         game.gameOver(black.getPlayerPieces(), white.getPlayerPieces())
         if(game.reset == True):
@@ -240,15 +243,6 @@ class Board(tk.Tk):
 
         if self.placements[from_pos][0] != 'open' and self.placements[to_pos][0] == 'open':
 
-            if self.gameType == 9:
-                if to_pos not in self.placements[from_pos][5]:
-                    print(f"Invalid move for 9 Men's Morris: {to_pos} is not directly connected to {from_pos}.")
-                    return False
-                elif self.gameType == 12:
-                    if to_pos not in self.placements[from_pos][5]:
-                        print(f"Invalid move for 12 Men's Morris: {to_pos} is not connected to {from_pos}.")
-                        return False
-
             self.placements[to_pos][0] = self.placements[from_pos][0]
             self.placements[to_pos][6].config(text="", height=3, width=5, bg=self.placements[to_pos][0])
 
@@ -260,7 +254,7 @@ class Board(tk.Tk):
             print("Invalid move: the target position is not open or the source position does not have a piece.")
             return False
 
-    def removeOpponentPiece(self, opponent_color):
+    def removeOpponentPiece(self, opponent_color, turn):
         removable_pieces = [key for key, value in self.placements.items() if
                             value[0] == opponent_color and value[1] != f"{opponent_color}Mill"]
         if not removable_pieces:
@@ -270,7 +264,11 @@ class Board(tk.Tk):
             print(f"No pieces to remove for {opponent_color}.")
             return
 
-        piece_to_remove = simpledialog.askstring("Remove Piece",
+        #check if remover is computer
+        if turn.getTurnType() == "computer":
+            piece_to_remove = random.choice(removable_pieces)
+        else:
+            piece_to_remove = simpledialog.askstring("Remove Piece",
                                                  f"Select a piece to remove from {opponent_color}:\n" + "\n".join(
                                                      removable_pieces))
 
@@ -288,7 +286,6 @@ class Board(tk.Tk):
             print("Check" + "Invalid piece selected.")
 
     def AutoPlay(self, canvas, turn, origin):
-        print("it's the computer's turn")
         choice = random.choice(list(self.placements.keys()))
         self.onButtonPress(self.placements[choice], canvas, turn, origin)
         
