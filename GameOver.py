@@ -1,22 +1,24 @@
 import tkinter as tk
-from Replay import Replay
 
 class GameOver():
     def __init__(self):
         self.winner = None
+        self.reset= False
 
+    #function added to avoid clicking close button for each window opened
     def quit(self):
         quit()
         return False
 
-    def replay(self):
-        replay = Replay()
-        replay.replay()
-        return False
+
+    def replay(self, window):
+        self.reset = True
+        window.lower()
+        window.quit()
 
     def gameOverWindow(self, player):
-        window = tk.Tk()  # 这里使用 tk.Tk() 创建窗口
-
+        window = tk.Tk() 
+        
         window.title('Game Over!')
 
         window_width = 400
@@ -46,8 +48,8 @@ class GameOver():
         quit_button = tk.Button(options, text='Close', command=self.quit)
         quit_button.grid(column=0, row=0)
 
-        replay_button = tk.Button(options, text="Watch Replay", command=self.replay)
-        replay_button.grid(column=1, row=0)
+        replayButton = tk.Button(options, text="Watch Replay", command=lambda: self.replay(window))
+        replayButton.grid(column=1, row=0)
 
         # Overrides default exit button to close all windows
         window.protocol("WM_DELETE_WINDOW", self.quit)
@@ -56,15 +58,19 @@ class GameOver():
 
     def gameOver(self, blackPieces, whitePieces):
         if blackPieces < 3:
-            self.winner = 'white'
+            self.winner = 'White'
             window = self.gameOverWindow(self.winner)
             window.mainloop()
             return True
         elif whitePieces < 3:
-            self.winner = 'black'
+            self.winner = 'Black'
             window = self.gameOverWindow(self.winner)
             window.mainloop()
             return True
         else:
             self.winner = None  # Game not over
             return False
+
+    def replayGameOver(self, winner):
+        window = self.gameOverWindow(winner)
+        window.mainloop()
