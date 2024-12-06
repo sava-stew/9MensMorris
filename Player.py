@@ -1,7 +1,7 @@
 class Player():
     def __init__(self):
-        self.bankPieces = 9
-        self.playerPieces = 9
+        self.bankPieces = 6
+        self.playerPieces = 6
 
     def setPieces(self, num):
         self.bankPieces = num

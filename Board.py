@@ -6,23 +6,21 @@ from Turn import Turn
 from Player import Player
 from GameOver import GameOver
 import random
+import time
 
 black = Player()
 white = Player()
 game = GameOver()
 
 class Board(tk.Tk):
-    placements = {}
-    mills = []
-    gameType = 0
-    opponent = ""
 
     def __init__(self, setUp):
         super().__init__()
-        self.placements = dict(setUp.placements)
-        self.mills = list(setUp.mills)
-        self.gameType = setUp.gameType
-        self.opponent = setUp.opponent
+        self.configure = setUp
+        self.placements = dict(self.configure.placements)
+        self.mills = list(self.configure.mills)
+        self.gameType = self.configure.gameType
+        
         black.setPieces(self.gameType)
         white.setPieces(self.gameType)
         gamefile = open('gamefile.txt', 'w')
@@ -131,7 +129,6 @@ class Board(tk.Tk):
             board.create_line((480, 20), (315, 160), fill='black')
             board.create_line((20, 480), (175, 340), fill='black')
             board.create_line((480, 480), (315, 340), fill='black')
-
         #draw board
         #add Buttons to dict
         for value in self.placements.values():
@@ -158,7 +155,6 @@ class Board(tk.Tk):
         self.createBoard()
         self.currentTurn('white')
         self.banks()
-        #self.replayOptions()
 
     def onButtonPress(self, button, canvas, turn, origin):
         turn_complete = False
@@ -175,13 +171,13 @@ class Board(tk.Tk):
                 if button[0] == "open" and whoseTurn == 'black' and black.getBankPieces() != 0:
                     black.bankUpdate()
                     button[0] = "black"
-                    self.writeToFile(whoseTurn + ': ' + button[4] + '\n')
-                    turn_complete = True
+                    self.writeToFile(whoseTurn + ':place ' + button[4] + '\n')
+                    turn.changeTurn()
                 elif button[0] == "open" and whoseTurn == 'white' and white.getBankPieces() != 0:
                     white.bankUpdate()
                     button[0] = "white"
-                    self.writeToFile(whoseTurn + ': ' + button[4] + '\n')
-                    turn_complete = True
+                    self.writeToFile(whoseTurn + ':place ' + button[4] + '\n')
+                    turn.changeTurn()
             else:
                 if button[0] == whoseTurn:
                     origin = button[4]
@@ -190,12 +186,12 @@ class Board(tk.Tk):
                 origin = button[4]
             elif boardPieces > 3 and button[4] in self.placements[origin][5]:
                 if self.move_piece(origin, button[4]):
-                    self.writeToFile(whoseTurn + ': ' + origin + ' to ' + button[4] + '\n')
+                    self.writeToFile(whoseTurn + ':move ' + origin + '-' + button[4] + '\n')
                     origin = ""
                     turn_complete = True
             elif boardPieces <= 3:
                 if self.move_piece(origin, button[4]):
-                    self.writeToFile(whoseTurn + ': ' + origin + ' to ' + button[4] + '\n')
+                    self.writeToFile(whoseTurn + ':move ' + origin + '-' + button[4] + '\n')
                     origin = ""
                     turn_complete = True
 
@@ -206,12 +202,12 @@ class Board(tk.Tk):
         self.banks()
         self.drawButtons(canvas, turn, origin)
         game.gameOver(black.getPlayerPieces(), white.getPlayerPieces())
+        if(game.reset == True):
+            game.reset = False
+            self.resetButtons()
+            self.replay()
 
-
-    def checkMills(self, turn):
-        # list of mills has been moved to be a class-level variable to allow for differences
-        # between 9 mens morris and 12 mens morris
-
+    def checkMills(self):
         whiteMills = []
         blackMills = []
 
@@ -220,13 +216,13 @@ class Board(tk.Tk):
                 0] == "white":
                 if self.placements[mill[0]][1] != "whiteMill" or self.placements[mill[1]][1] != "whiteMill" or \
                         self.placements[mill[2]][1] != "whiteMill":
-                    self.writeToFile('white mill: ' + self.placements[mill[0]][4] + ', ' + self.placements[mill[1]][4] + ', ' + self.placements[mill[2]][4] + '\n')
-                    self.removeOpponentPiece("black", turn)
+                    self.writeToFile('white:mill ' + self.placements[mill[0]][4] + '-' + self.placements[mill[1]][4] + '-' + self.placements[mill[2]][4] + '\n')
+                    self.removeOpponentPiece("black")
                 whiteMills.append(mill)
             elif self.placements[mill[0]][0] == "black" and self.placements[mill[1]][0] == "black" and self.placements[mill[2]][0] == "black":
                 if self.placements[mill[0]][1] != "blackMill" or self.placements[mill[1]][1] != "blackMill" or self.placements[mill[2]][1] != "blackMill":
-                    self.writeToFile('black mill: ' + self.placements[mill[0]][4] + ', ' + self.placements[mill[1]][4] + ', ' + self.placements[mill[2]][4] + '\n')
-                    self.removeOpponentPiece("white", turn)
+                    self.writeToFile('black:mill ' + self.placements[mill[0]][4] + '-' + self.placements[mill[1]][4] + '-' + self.placements[mill[2]][4] + '\n')
+                    self.removeOpponentPiece("white")
                 blackMills.append(mill)
 
         for placement in self.placements.values():
@@ -281,11 +277,11 @@ class Board(tk.Tk):
             self.placements[piece_to_remove][6].config(text="O", height=1, width=3, bg="SystemButtonFace")
             if opponent_color == "white":
                 white.pieceUpdate()
-                self.writeToFile('black removed: ' + piece_to_remove + '\n')
+                self.writeToFile('black:take ' + piece_to_remove + '\n')
             elif opponent_color == "black":
                 black.pieceUpdate()
-                self.writeToFile('white removed: ' + piece_to_remove + '\n')
-            #print(f"Removed {opponent_color} piece at {piece_to_remove}.")
+                self.writeToFile('white:take ' + piece_to_remove + '\n')
+            print(f"Removed {opponent_color} piece at {piece_to_remove}.")
         else:
             print("Check" + "Invalid piece selected.")
 
@@ -297,4 +293,53 @@ class Board(tk.Tk):
         self.gamefile = open('gamefile.txt', 'a')
         self.gamefile.write(turnInfo)
         self.gamefile.close()
+
+    def resetButtons(self):
+        for placement in self.placements.values():
+            placement[0] = 'open'
+            placement[6].config(text = 'O', height=1, width=1, bg='white')
+            self.update_idletasks()
+        self.update_idletasks()
+
+    def replay(self):
+        currentPlayer = None
+        with open('gamefile.txt', 'r') as file:
+            for line in file:
+                time.sleep(1)
+                line = line.strip('\n')
+                print(line)
+                command = line.split(':')
+                currentPlayer = command[0]
+
+                if 'place' in (command[1]):
+                    playInfo = command[1].split(' ')
+                    placement = (playInfo[1]).strip('\n')
+                    print(placement + '\n')
+                    self.placements[placement][0] = currentPlayer
+                    self.placements[placement][6].config(text='', height=3, width=5, bg=currentPlayer)
+
+                if 'move' in (command[1]):
+                    playInfo = command[1].split(' ')
+                    placements = playInfo[1].split('-')
+                    start = placements[0]
+                    end = placements[1]
+                    print(start)
+                    print(end)
+                    self.placements[start][0] = 'open'
+                    self.placements[start][6].config(text='O', height=1, width=1, bg='white')
+                    self.update_idletasks()
+                    self.placements[end][0] = command[0]
+                    self.placements[end][6].config(text='', height=3, width=5, bg=currentPlayer)
+
+                if 'take' in (command[1]):
+                    playInfo = command[1].split(' ')
+                    placement = playInfo[1]
+                    placement = placement.strip('\n')
+                    print(placement + '\n')
+                    self.placements[placement][0] = 'open'
+                    self.placements[placement][6].config(text='O', height=1, width=1, bg='white')
+
+                self.update_idletasks()
+
+        game.replayGameOver(currentPlayer)
 
