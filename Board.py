@@ -14,6 +14,7 @@ game = GameOver()
 
 class Board(tk.Tk):
 
+
     def __init__(self, setUp):
         super().__init__()
         self.configure = setUp
@@ -72,38 +73,11 @@ class Board(tk.Tk):
         blackBank.grid(column=2, row=1)
         self.createPieces(blackBank, black.getBankPieces(), 20, 40, 'black')
 
-    def replayOptions(self):
-        delay = IntVar()
-        replayOptions = tk.Canvas(self, width=400, height=80, bg='grey')
-        replayOptions.grid(column=1, row=2)
-
-        label = tk.Label(replayOptions, text='Game Replay')
-        replayOptions.create_window(200, 20,window=label)
-
-        manReplay = tk.Button(replayOptions, text='Manual Replay')
-        replayOptions.create_window(100, 50, window=manReplay)
-
-        options = [
-            2,
-            4,
-            6,
-            8,
-            10
-        ]
-
-        delay.set(2)
-
-        drop = ttk.OptionMenu(replayOptions, delay, options[0], *options)
-        replayOptions.create_window(340, 50, window=drop)
-
-        autoReplay = tk.Button(replayOptions, text='Auto Replay')
-        replayOptions.create_window(290, 50, window=autoReplay)
-
     def createBoard(self):
         board = tk.Canvas(self, width=500, height=500, bg='#987554')
         board.grid(column=1, row=1)
 
-        turn = Turn(game_type=self.opponent)
+        turn = Turn()
 
         #draw lines
         board.create_line((20, 20), (480, 20), fill='black')
@@ -132,13 +106,22 @@ class Board(tk.Tk):
         #draw board
         #add Buttons to dict
         for value in self.placements.values():
-            value.append(tk.Button(board, text='O'))
+            value[6] = (tk.Button(board, text='O'))
 
         self.drawButtons(board, turn)
 
     def drawButtons(self, canvas, turn, origin=""):
+        if canvas is None:
+            raise ValueError("Canvas is None! Ensure it's properly initialized.")
+
+        print(f"Canvas: {canvas}")
+
         for placement in self.placements.values():
+            if placement[6] is None:
+                placement[6] = tk.Button(canvas) 
+                
             placement[6].config(command=lambda i=placement: Board.onButtonPress(self, i, canvas, turn, origin))
+
             if placement[0] == "open":
                 canvas.create_window(placement[2], placement[3], window=placement[6])
             elif placement[0] == "white":
@@ -147,6 +130,7 @@ class Board(tk.Tk):
             elif placement[0] == "black":
                 placement[6].config(text="", height=3, width=5, bg="black")
                 canvas.create_window(placement[2], placement[3], window=placement[6])
+
         if turn.getTurnType() == "computer":
             self.AutoPlay(canvas, turn, origin)
         return
@@ -157,8 +141,11 @@ class Board(tk.Tk):
         self.banks()
 
     def onButtonPress(self, button, canvas, turn, origin):
-        turn_complete = False
+        if canvas is None:
+            raise ValueError("Canvas is None! Ensure it's properly initialized.")
+        
         whoseTurn = turn.getTurn()
+
         if whoseTurn == "white":
             bankPieces = white.getBankPieces()
             boardPieces = white.getPlayerPieces()
@@ -168,39 +155,40 @@ class Board(tk.Tk):
 
         if origin == "":
             if bankPieces != 0:
-                if button[0] == "open" and whoseTurn == 'black' and black.getBankPieces() != 0:
-                    black.bankUpdate()
-                    button[0] = "black"
-                    self.writeToFile(whoseTurn + ':place ' + button[4] + '\n')
-                    turn.changeTurn()
-                elif button[0] == "open" and whoseTurn == 'white' and white.getBankPieces() != 0:
-                    white.bankUpdate()
-                    button[0] = "white"
-                    self.writeToFile(whoseTurn + ':place ' + button[4] + '\n')
-                    turn.changeTurn()
+                if button[0] == "open":
+                    if whoseTurn == "black" and black.getBankPieces() != 0:
+                        black.bankUpdate()
+                        button[0] = "black"
+                        self.writeToFile(whoseTurn + ':place ' + button[4] + '\n')
+                        turn.changeTurn()
+                    elif whoseTurn == "white" and white.getBankPieces() != 0:
+                        white.bankUpdate()
+                        button[0] = "white"
+                        self.writeToFile(whoseTurn + ':place ' + button[4] + '\n')
+                        turn.changeTurn()
             else:
                 if button[0] == whoseTurn:
-                    origin = button[4]
+                    origin = button[4] 
         else:
             if button[0] == whoseTurn:
-                origin = button[4]
+                origin = button[4]  
             elif boardPieces > 3 and button[4] in self.placements[origin][5]:
                 if self.move_piece(origin, button[4]):
                     self.writeToFile(whoseTurn + ':move ' + origin + '-' + button[4] + '\n')
-                    origin = ""
-                    turn_complete = True
+                    origin = ""  
+                    turn.changeTurn()
             elif boardPieces <= 3:
                 if self.move_piece(origin, button[4]):
                     self.writeToFile(whoseTurn + ':move ' + origin + '-' + button[4] + '\n')
-                    origin = ""
-                    turn_complete = True
+                    origin = ""  
+                    turn.changeTurn()
 
-        self.checkMills(turn)
-        if turn_complete:
-            turn.changeTurn()
         self.currentTurn(turn.getTurn())
         self.banks()
+        self.checkMills()
+
         self.drawButtons(canvas, turn, origin)
+
         game.gameOver(black.getPlayerPieces(), white.getPlayerPieces())
         if(game.reset == True):
             game.reset = False
@@ -254,9 +242,10 @@ class Board(tk.Tk):
             print("Invalid move: the target position is not open or the source position does not have a piece.")
             return False
 
-    def removeOpponentPiece(self, opponent_color, turn):
+    def removeOpponentPiece(self, opponent_color):
         removable_pieces = [key for key, value in self.placements.items() if
                             value[0] == opponent_color and value[1] != f"{opponent_color}Mill"]
+
         if not removable_pieces:
             removable_pieces = [key for key, value in self.placements.items() if value[0] == opponent_color]
 
@@ -264,26 +253,29 @@ class Board(tk.Tk):
             print(f"No pieces to remove for {opponent_color}.")
             return
 
-        #check if remover is computer
-        if turn.getTurnType() == "computer":
-            piece_to_remove = random.choice(removable_pieces)
-        else:
-            piece_to_remove = simpledialog.askstring("Remove Piece",
+        piece_to_remove = simpledialog.askstring("Remove Piece",
                                                  f"Select a piece to remove from {opponent_color}:\n" + "\n".join(
                                                      removable_pieces))
 
-        if piece_to_remove in removable_pieces:
-            self.placements[piece_to_remove][0] = 'open'
-            self.placements[piece_to_remove][6].config(text="O", height=1, width=3, bg="SystemButtonFace")
-            if opponent_color == "white":
-                white.pieceUpdate()
-                self.writeToFile('black:take ' + piece_to_remove + '\n')
-            elif opponent_color == "black":
-                black.pieceUpdate()
-                self.writeToFile('white:take ' + piece_to_remove + '\n')
-            print(f"Removed {opponent_color} piece at {piece_to_remove}.")
-        else:
-            print("Check" + "Invalid piece selected.")
+        if not piece_to_remove or piece_to_remove not in removable_pieces:
+            print(f"Invalid or empty piece selected: {piece_to_remove}.")
+            return
+
+        self.placements[piece_to_remove][0] = 'open'
+
+        if len(self.placements[piece_to_remove]) > 6: 
+            button = self.placements[piece_to_remove][6]
+            if button:
+                button.config(text="O", height=1, width=3, bg="SystemButtonFace")
+
+        if opponent_color == "white":
+            white.pieceUpdate() 
+            self.writeToFile('black:take ' + piece_to_remove + '\n')
+        elif opponent_color == "black":
+            black.pieceUpdate()  
+            self.writeToFile('white:take ' + piece_to_remove + '\n')
+
+        print(f"Removed {opponent_color} piece at {piece_to_remove}.")
 
     def AutoPlay(self, canvas, turn, origin):
         choice = random.choice(list(self.placements.keys()))
