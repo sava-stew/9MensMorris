@@ -187,6 +187,11 @@ class Board(tk.Tk):
         self.banks()
         self.drawButtons(canvas, turn, origin)
         game.gameOver(black.getPlayerPieces(), white.getPlayerPieces())
+        if (game.reset == True):
+            game.reset = False
+            self.resetButtons()
+            self.replay()
+
     def checkMills(self, turn):
         whiteMills = []
         blackMills = []
